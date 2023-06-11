@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   
   
-  <title>Hello World | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <meta name="description" content="[toc] 京东二面：MySQL 主从延迟，读写分离 7 种解决方案 (qq.com)，感觉写的有点水 京东一面：MySQL 主备延迟有哪些坑？主备切换策略 (qq.com) 主库不可用，主备切换有哪些策略1、可靠优先切换过程中，拒绝一切写操作，这样可以保证 slave上线后，是 master的完整复制 缺点： 中间有个阶段，A库和B库都是只读状态，此时系统对外不能提供写服务。 2、可用优先当然我">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/hello-world/index.html">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%BB%E4%BB%8E%E7%9B%B8%E5%85%B3/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="[toc] 京东二面：MySQL 主从延迟，读写分离 7 种解决方案 (qq.com)，感觉写的有点水 京东一面：MySQL 主备延迟有哪些坑？主备切换策略 (qq.com) 主库不可用，主备切换有哪些策略1、可靠优先切换过程中，拒绝一切写操作，这样可以保证 slave上线后，是 master的完整复制 缺点： 中间有个阶段，A库和B库都是只读状态，此时系统对外不能提供写服务。 2、可用优先当然我">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-06-11T14:08:24.296Z">
-<meta property="article:modified_time" content="2023-06-11T14:08:24.296Z">
+<meta property="article:published_time" content="2023-06-11T10:43:17.548Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.549Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -75,46 +75,36 @@
 </header>
 
       <div class="outer">
-        <section id="main"><article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-JavaInterview/数据库/主从相关" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2023/06/11/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2023-06-11T14:08:24.296Z" itemprop="datePublished">2023-06-11</time>
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%BB%E4%BB%8E%E7%9B%B8%E5%85%B3/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.548Z" itemprop="datePublished">2023-06-11</time>
 </a>
     
   </div>
   <div class="article-inner">
     
     
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      Hello World
-    </h1>
-  
-
-      </header>
-    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/e7g4J5G78RS0IC_ig4jcBg">京东二面：MySQL 主从延迟，读写分离 7 种解决方案 (qq.com)</a>，感觉写的有点水</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg2NzYyNjQzNg==&mid=2247491111&idx=1&sn=202d8dcb3e551039c129ac673414559b&scene=21#wechat_redirect">京东一面：MySQL 主备延迟有哪些坑？主备切换策略 (qq.com)</a></p>
+<h1 id="主库不可用，主备切换有哪些策略"><a href="#主库不可用，主备切换有哪些策略" class="headerlink" title="主库不可用，主备切换有哪些策略"></a>主库不可用，主备切换有哪些策略</h1><h2 id="1、可靠优先"><a href="#1、可靠优先" class="headerlink" title="1、可靠优先"></a><strong>1、可靠优先</strong></h2><p>切换过程中，拒绝一切写操作，这样可以保证 slave上线后，是 master的完整复制</p>
+<p>缺点：</p>
+<p>中间有个阶段，A库和B库都是只读状态，此时系统对外不能提供写服务。</p>
+<h2 id="2、可用优先"><a href="#2、可用优先" class="headerlink" title="2、可用优先"></a><strong>2、可用优先</strong></h2><p>当然我们也可以不用等主备数据同步完成，在一开始时就直接将流量切到备库。</p>
+<p>这样备库的流量就可能有两个来源：</p>
+<ul>
+<li>主库之前的剩余流量 binlog</li>
+<li>客户端新请求进来的流量</li>
+</ul>
+<p>两部分流量冲击，会对 <code>数据一致性</code> 造成一些影响。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://balanced-b-tree.github.io/2023/06/11/hello-world/" data-id="cliri7bmk0000cfszfvib3ng5" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%BB%E4%BB%8E%E7%9B%B8%E5%85%B3/" data-id="cliribsx90005hlsz3afxfgbn" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -124,8 +114,17 @@
     
 <nav id="article-nav">
   
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
   
-    <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/" id="article-nav-older" class="article-nav-link-wrap">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title"></div>
     </a>

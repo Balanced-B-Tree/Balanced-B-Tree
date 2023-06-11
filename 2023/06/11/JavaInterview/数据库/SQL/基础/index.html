@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="范式第一范式-》第二范式，消除部分依赖  年龄依赖于学号，成绩依赖于学号、课程。导致，年龄部分依赖于学号、课程 第二范式-》第三范式，消除传递依赖  学院依赖于学号，学院电话依赖于学院。导致，学院电话传递依赖于学号 函数依赖完全函数依赖{学号,课号}–&gt;成绩  学号+课号 可以决定 成绩 但只有学号or只有课号无法决定成绩  部分函数依赖{学号,课号}–&gt;姓名    只有学号就能决定姓">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="范式第一范式-》第二范式，消除部分依赖  年龄依赖于学号，成绩依赖于学号、课程。导致，年龄部分依赖于学号、课程 第二范式-》第三范式，消除传递依赖  学院依赖于学号，学院电话依赖于学院。导致，学院电话传递依赖于学号 函数依赖完全函数依赖{学号,课号}–&gt;成绩  学号+课号 可以决定 成绩 但只有学号or只有课号无法决定成绩  部分函数依赖{学号,课号}–&gt;姓名    只有学号就能决定姓">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E5%9F%BA%E7%A1%80.assets/v2-7f7eebadb49ad8f4ce7ad6a4d81d5709_1440w.jpg">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E5%9F%BA%E7%A1%80.assets/v2-466f83a8405c42468650b362d28b72c5_1440w.jpg">
+<meta property="article:published_time" content="2023-06-11T10:43:17.520Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.520Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/%E5%9F%BA%E7%A1%80.assets/v2-7f7eebadb49ad8f4ce7ad6a4d81d5709_1440w.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/SQL/基础" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.520Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="范式"><a href="#范式" class="headerlink" title="范式"></a>范式</h1><p>第一范式-》第二范式，消除部分依赖</p>
+<p><img src="/%E5%9F%BA%E7%A1%80.assets/v2-7f7eebadb49ad8f4ce7ad6a4d81d5709_1440w.jpg" alt="img"></p>
+<p>年龄依赖于<strong>学号</strong>，成绩依赖于<strong>学号</strong>、<strong>课程</strong>。导致，年龄部分依赖于<strong>学号</strong>、<strong>课程</strong></p>
+<p>第二范式-》第三范式，消除传递依赖</p>
+<p><img src="/%E5%9F%BA%E7%A1%80.assets/v2-466f83a8405c42468650b362d28b72c5_1440w.jpg" alt="img"></p>
+<p>学院依赖于<strong>学号</strong>，学院电话依赖于<strong>学院</strong>。导致，学院电话传递依赖于<strong>学号</strong></p>
+<h2 id="函数依赖"><a href="#函数依赖" class="headerlink" title="函数依赖"></a>函数依赖</h2><h3 id="完全函数依赖"><a href="#完全函数依赖" class="headerlink" title="完全函数依赖"></a>完全函数依赖</h3><p>{学号,课号}–&gt;成绩</p>
+<p> <strong>学号+课号</strong> 可以决定 <strong>成绩</strong> 但只有学号or只有课号无法决定<strong>成绩</strong> </p>
+<h3 id="部分函数依赖"><a href="#部分函数依赖" class="headerlink" title="部分函数依赖"></a>部分函数依赖</h3><p>{学号,课号}–&gt;姓名   </p>
+<p>只有学号就能决定<strong>姓名</strong>  (课号是冗余的) </p>
+<h3 id="平凡函数依赖"><a href="#平凡函数依赖" class="headerlink" title="平凡函数依赖"></a>平凡函数依赖</h3><p>在一个职工关系中，职工号总能函数决定它本身，记作“职工号→职工号”，对于任一个给定的职工号，都有它本身的职工号值唯一对应，此为平凡函数依赖。</p>
+<h2 id="范式-1"><a href="#范式-1" class="headerlink" title="范式"></a>范式</h2><h3 id="一范式"><a href="#一范式" class="headerlink" title="一范式"></a>一范式</h3><p>要求：每一个分量必须是不可分的数据项。</p>
+<p>特点：</p>
+<ol>
+<li><p>有主键，且主键不能为空。</p>
+</li>
+<li><p>字段不能再分。</p>
+</li>
+</ol>
+<h3 id="二范式"><a href="#二范式" class="headerlink" title="二范式"></a>二范式</h3><p>要求：在范式一的基础上，且每一个非主属性完全函数依赖于码。</p>
+<p>特点：</p>
+<ol>
+<li><p>满足第一范式。</p>
+</li>
+<li><p>表中的每一个非主属性，必须完全依赖于本表码。（&#x3D;&#x3D;消除部分依赖&#x3D;&#x3D;）</p>
+</li>
+</ol>
+<p>当，表中的主码，由两个或以上的属性组成的时候，才会出现不符合第二范式的情况。</p>
+<h3 id="第三范式-3NF"><a href="#第三范式-3NF" class="headerlink" title="第三范式 3NF"></a>第三范式 3NF</h3><p>要求：在满足第二范式的基础上，且每一个非主属性既<strong>不部分依赖</strong>于码也<strong>不传递依赖</strong>于码。</p>
+<p>特点：</p>
+<ol>
+<li><p>满足第二范式。</p>
+</li>
+<li><p>非主属性不能传递依赖于码。（&#x3D;&#x3D;消除传递依赖&#x3D;&#x3D;）</p>
+</li>
+</ol>
+<blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;学号     系别     系主任</span><br><span class="line">&gt;Sno     Sdept     Shead</span><br><span class="line">&gt;1001   计算机系    张三</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>主键：Sno</p>
+<p>不满足原因：Shead传递依赖于码，<code>Sno-&gt;Sdept</code>，<code>Sdept-&gt;Shead</code>，可得<code>Sno-&gt;Shead</code>。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" data-id="cliribsxg000hhlszck9dhk4b" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

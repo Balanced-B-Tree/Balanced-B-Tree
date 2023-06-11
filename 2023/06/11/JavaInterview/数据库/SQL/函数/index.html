@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="批量更新时使用 when、then12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849update city     set longitude &#x3D; (case when city_code &#x3D; 000794 then 121.4736580000">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="批量更新时使用 when、then12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849update city     set longitude &#x3D; (case when city_code &#x3D; 000794 then 121.4736580000">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-06-11T10:43:17.518Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.518Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/SQL/函数" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.518Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="批量更新时使用-when、then"><a href="#批量更新时使用-when、then" class="headerlink" title="批量更新时使用 when、then"></a>批量更新时使用 when、then</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> city</span><br><span class="line">     <span class="keyword">set</span> longitude <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000794</span> <span class="keyword">then</span> <span class="number">121.4736580000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">125.3235700000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">120.3829900000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">113.2643850000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">113.1219200000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">104.0647600000</span></span><br><span class="line">                <span class="keyword">end</span>),</span><br><span class="line">          latitude <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span><span class="number">000794</span> <span class="keyword">then</span> <span class="number">31.2303780000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">43.8160200000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">36.0662300000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">23.1291120000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">23.0218500000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">30.5702000000</span></span><br><span class="line">                 <span class="keyword">end</span>),</span><br><span class="line">          opened <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span><span class="number">000794</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                 <span class="keyword">end</span>)</span><br><span class="line">   <span class="keyword">where</span> city_code <span class="keyword">in</span> (<span class="number">000794</span>,<span class="number">000582</span>,<span class="number">001373</span>,<span class="number">001957</span>,<span class="number">002000</span>,<span class="number">002293</span>);</span><br><span class="line">   </span><br><span class="line"> <span class="number">1</span> <span class="operator">&lt;</span><span class="keyword">update</span> id<span class="operator">=</span>&quot;updateChartParamByAccountAndChartid&quot; parameterType<span class="operator">=</span>&quot;list&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">2</span>         <span class="keyword">update</span> followme_parameters</span><br><span class="line"> <span class="number">3</span>         <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;set&quot; suffixOverrides<span class="operator">=</span>&quot;,&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">4</span>             <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;signal_source =case&quot; suffix<span class="operator">=</span>&quot;end,&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">5</span>                 <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">6</span>                     <span class="operator">&lt;</span>if test<span class="operator">=</span>&quot;item.signalSource!=null&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">7</span>                         <span class="keyword">when</span> account<span class="operator">=</span>#&#123;item.account&#125; <span class="keyword">and</span> chart_id<span class="operator">=</span>#&#123;item.chartId&#125;</span><br><span class="line"> <span class="number">8</span>                          <span class="keyword">then</span> #&#123;item.signalSource&#125;</span><br><span class="line"> <span class="number">9</span>                     <span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br><span class="line"><span class="number">10</span>                 <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">11</span>             <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">12</span>             <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;rate =case&quot; suffix<span class="operator">=</span>&quot;end,&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">13</span>                 <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">14</span>                     <span class="operator">&lt;</span>if test<span class="operator">=</span>&quot;item.rate!=null&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">15</span>                         <span class="keyword">when</span> account<span class="operator">=</span>#&#123;item.account&#125; <span class="keyword">and</span> chart_id<span class="operator">=</span>#&#123;item.chartId&#125;</span><br><span class="line"><span class="number">16</span>                         <span class="keyword">then</span> #&#123;item.rate&#125;</span><br><span class="line"><span class="number">17</span>                     <span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br><span class="line"><span class="number">18</span>                 <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">19</span>             <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">20</span>         <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">21</span>         <span class="keyword">where</span> id <span class="keyword">in</span></span><br><span class="line"><span class="number">22</span>         <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot; separator<span class="operator">=</span>&quot;,&quot; <span class="keyword">open</span><span class="operator">=</span>&quot;(&quot; <span class="keyword">close</span><span class="operator">=</span>&quot;)&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">23</span>             #&#123;item.id&#125;</span><br><span class="line"><span class="number">24</span>         <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">25</span>     <span class="operator">&lt;</span><span class="operator">/</span><span class="keyword">update</span><span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/" data-id="cliribsxg000ghlszfqtmcitu" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

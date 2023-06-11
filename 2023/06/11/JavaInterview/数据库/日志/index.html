@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="[toc] MySQL三大日志(binlog、redo log和undo log)详解 | JavaGuide 日志面试官：MySQL事务是怎么实现的_Sicimike的博客-CSDN博客_mysql的事务是怎么实现的 undo log和redo log并不是直接写到磁盘上的，而是先写入log buffer。再等待合适的时机同步到OS buffer，再由操作系统决定何时刷到磁盘，具体过程如下：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="[toc] MySQL三大日志(binlog、redo log和undo log)详解 | JavaGuide 日志面试官：MySQL事务是怎么实现的_Sicimike的博客-CSDN博客_mysql的事务是怎么实现的 undo log和redo log并不是直接写到磁盘上的，而是先写入log buffer。再等待合适的时机同步到OS buffer，再由操作系统决定何时刷到磁盘，具体过程如下：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/20200425210059474.jpg">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/20200308212726564.jpg">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70-20230605224641896.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/02-20220305234828662.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/04-20220305234956774.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/v2-9a0f80a6e14e7c15ec01d66ed16e086d_1440w.jpg">
+<meta property="article:published_time" content="2023-06-11T10:43:17.569Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.570Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/%E6%97%A5%E5%BF%97.assets/20200425210059474.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/日志" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.569Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://javaguide.cn/database/mysql/mysql-logs.html#%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4">MySQL三大日志(binlog、redo log和undo log)详解 | JavaGuide</a></p>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Baisitao_/article/details/104723795">面试官：MySQL事务是怎么实现的_Sicimike的博客-CSDN博客_mysql的事务是怎么实现的</a></p>
+<p><code>undo log</code>和<code>redo log</code>并不是直接写到磁盘上的，而是先写入<code>log buffer</code>。再等待合适的时机同步到<code>OS buffer</code>，再由操作系统决定何时刷到磁盘，具体过程如下：</p>
+<p><img src="/%E6%97%A5%E5%BF%97.assets/20200425210059474.jpg" alt="在这里插入图片描述"></p>
+<p>既然undo log和redo log都是从log buffer 到 OS buffer，再到磁盘。所以中途还是有可能因为断电&#x2F;硬件故障等原因导致日志丢失。为此MySQL提供了三种持久化方式，innodb_flush_log_at_trx_commit 这个参数主要控制InnoDB将log buffer中的数据写入OS buffer，并刷到磁盘的时间点，取值分别为0，1，2，默认是1。这三个值的意思分别如下</p>
+<p><img src="/%E6%97%A5%E5%BF%97.assets/20200308212726564.jpg" alt="log file刷盘策略"></p>
+<p>redo、undo log都是 innoDb的</p>
+<h2 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h2><p><code>redo log</code>是innodb引擎级别，用来记录innodb存储引擎的事务日志，不管事务是否提交都会记录下来（只记录修改），用于数据恢复。</p>
+<p>当数据库发生故障，innoDB存储引擎会使用<code>redo log</code>恢复到发生故障前的时刻，以此来保证数据的完整性。将参数<code>innodb_flush_log_at_tx_commit</code>设置为1，那么在执行commit时会将<code>redo log</code>同步写到磁盘。</p>
+<h2 id="undo-log"><a href="#undo-log" class="headerlink" title="undo log"></a>undo log</h2><p>[MySQL 的undo什么时候写到硬盘？ - 知乎 (zhihu.com)](<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/456507056#:~:text=1%3A">https://www.zhihu.com/question/456507056#:~:text=1%3A</a> undo log有没有像redo一样的buffer？,%3D%3D%3D%3D 有undo buffer的，写undo log前，会先放在内存buffer中。)</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Weixiaohuai/article/details/117867353">MySQL回滚日志（undo log）总结_每天都要进步一点点的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/362208179">事务回滚 原子性 undo日志 回滚段 什么时候删除undo日志 - 知乎 (zhihu.com)</a></p>
+<p><img src="/%E6%97%A5%E5%BF%97.assets/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1dlaXhpYW9odWFp,size_16,color_FFFFFF,t_70-20230605224641896.png" alt="img"></p>
+<p>除了记录<code>redo log</code>外，当进行数据修改时还会记录<code>undo log</code>，<code>undo log</code>用于数据的撤回操作，它保留了记录修改前的内容。通过<code>undo log</code>可以实现事务回滚，并且可以根据<code>undo log</code>回溯到某个特定的版本的数据，<strong>实现MVCC</strong>。</p>
+<p>undo log 也是 innodb的。</p>
+<p>用处：</p>
+<ol>
+<li>事务回滚。事务回滚，实现了<code>原子性</code>。事务回滚有两种场景<ol>
+<li>MySQL服务器宕机重启。宕机时，一个事务执行了一半，updataA落表了，但是 updateB没有落表。此时 MySQL通过 redo log发现“该事务没有成功”，于是通过 undo log，将数据回滚</li>
+<li>程序异常导致的回滚。</li>
+</ol>
+</li>
+<li>实现 MVCC</li>
+</ol>
+<p>Q：事务中断时，undo log没有刷入到磁盘，怎么办？</p>
+<p>A：</p>
+<h2 id="binlog"><a href="#binlog" class="headerlink" title="binlog"></a>binlog</h2><p><code>redo log</code> 它是物理日志，记录内容是“在某个数据页上做了什么修改”，属于 <code>InnoDB</code> 存储引擎。</p>
+<p>而 <code>binlog</code> 是逻辑日志，记录内容是语句的原始逻辑，类似于“给 ID&#x3D;2 这一行的 c 字段加 1”，属于<code>MySQL Server</code> 层。是MySQL数据库级别的文件，记录对MySQL数据库执行修改的所有操作，不会记录select和show语句，主要用于恢复数据库和同步数据库。&#x3D;&#x3D;<code>binlog</code>只有在提交事务时才写入。&#x3D;&#x3D;</p>
+<p>区别：</p>
+<ol>
+<li><code>bin log</code>会记录所有日志记录，包括InnoDB、MyISAM等存储引擎的日志；<code>redo log</code>只记录innoDB自身的事务日志。</li>
+<li><code>bin log</code>只在事务提交前写入到磁盘，一个事务只写一次；而在事务进行过程，会有<code>redo log</code>不断写入磁盘。</li>
+<li><code>bin log</code>是逻辑日志，记录的是SQL语句的原始逻辑；<code>redo log</code>是物理日志，记录的是在某个数据页上做了什么修改。</li>
+</ol>
+<p>不管用什么存储引擎，只要发生了表数据更新，都会产生 <code>binlog</code> 日志。</p>
+<p>那 <code>binlog</code> 到底是用来干嘛的？</p>
+<p>可以说<code>MySQL</code>数据库的<strong>数据备份、主备、主主、主从</strong>都离不开<code>binlog</code>，需要依靠<code>binlog</code>来同步数据，保证数据一致性。</p>
+<h1 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h1><p><code>redo log</code>与<code>binlog</code>的写入时机不一样。以基本的事务为单位，<code>redo log</code>在事务执行过程中可以不断写入，而<code>binlog</code>只有在提交事务时才写入。</p>
+<p>那么，<code>redo log</code>与<code>binlog</code>两份日志之间的逻辑不一致，会出现什么问题？</p>
+<h2 id="不一致举例"><a href="#不一致举例" class="headerlink" title="不一致举例"></a>不一致举例</h2><p>以<code>update</code>语句为例，假设<code>id=2</code>的记录，字段<code>c</code>值是<code>0</code>，把字段<code>c</code>值更新成<code>1</code>，<code>SQL</code>语句为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> T <span class="keyword">set</span> c<span class="operator">=</span><span class="number">1</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E6%97%A5%E5%BF%97.assets/02-20220305234828662.png" alt="img"></p>
+<p>由于<code>binlog</code>没写完就异常，这时候<code>binlog</code>里面没有对应的修改记录。因此，之后用<code>binlog</code>日志恢复数据时，就会少这一次更新，恢复出来的这一行<code>c</code>值是<code>0</code>，而原库因为<code>redo log</code>日志恢复，这一行<code>c</code>值是<code>1</code>，最终数据不一致。</p>
+<h2 id="两阶段提交-1"><a href="#两阶段提交-1" class="headerlink" title="两阶段提交"></a>两阶段提交</h2><p>为了解决两份日志之间的逻辑一致问题，<code>InnoDB</code>存储引擎使用<strong>两阶段提交</strong>方案。</p>
+<p>原理很简单，将<code>redo log</code>的写入拆成了两个步骤<code>prepare</code>和<code>commit</code>，这就是<strong>两阶段提交</strong>。</p>
+<p><img src="/%E6%97%A5%E5%BF%97.assets/04-20220305234956774.png" alt="img"></p>
+<p>若binlog出现异常，<code>MySQL</code>根据<code>redo log</code>日志恢复数据时，发现<code>redo log</code>还处于<code>prepare</code>阶段，并且没有对应的<code>binlog</code>日志，就会回滚该事务。</p>
+<p>若binlog没有异常，但是 <code>redo log</code> commit 异常。此时并不会回滚事务，虽然<code>redo log</code>是处于<code>prepare</code>阶段，但是能通过事务<code>id</code>找到对应的<code>binlog</code>日志，所以<code>MySQL</code>认为是完整的，就会提交事务恢复数据。</p>
+<h1 id="Master的宕机恢复"><a href="#Master的宕机恢复" class="headerlink" title="Master的宕机恢复"></a>Master的宕机恢复</h1><p>[MySQL InnoDB 恢复(recovery)详细流程 - VicLW - 博客园 (cnblogs.com)](<a target="_blank" rel="noopener" href="https://www.cnblogs.com/VicLiu/p/12606597.html#:~:text=1">https://www.cnblogs.com/VicLiu/p/12606597.html#:~:text=1</a> 从ib_logfile1的指定位置开始读取redo log，每次读取4 * page_size的大小，这里我们默认页面大小为16K，所以每次读取64K的redo log到缓存中，redo log每条记录,(block)的大小为512字节 2 读取到缓存中的redo log通过解析、验证等一系列过程后，把redo log的内容部分保存到用于恢复的缓存recv_sys-&gt;buf，保存到恢复缓存中的每条信息主要包含两部分： (space%2Coffset)组成的位置信息和具体redo log的内容，我们称之为body 更多项目)</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/346970015">基于Redo Log和Undo Log的MySQL崩溃恢复流程 - 知乎 (zhihu.com)</a></p>
+<p><img src="/%E6%97%A5%E5%BF%97.assets/v2-9a0f80a6e14e7c15ec01d66ed16e086d_1440w.jpg" alt="img"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" data-id="cliribsxd000bhlsz4grg5ftu" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E8%BF%9B%E5%BA%A6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/page/2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-JavaInterview/数据库/优化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BC%98%E5%8C%96/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.554Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="业务主表读写缓慢如何优化？-qq-com"><a href="#业务主表读写缓慢如何优化？-qq-com" class="headerlink" title="业务主表读写缓慢如何优化？ (qq.com)"></a><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/vIwfa-C8-V-Wyb8dCOV1tQ">业务主表读写缓慢如何优化？ (qq.com)</a></h1><h2 id="冷热分离"><a href="#冷热分离" class="headerlink" title="冷热分离"></a>冷热分离</h2><ul>
+<li><strong>热数据</strong>：被频繁更新；响应时间有要求</li>
+<li><strong>冷数据</strong>：不允许更新（具体业务系统具体分析），偶尔被查询；响应时间无要求。</li>
+</ul>
+<p>如果出现了以下场景则应该考虑冷热分离：</p>
+<ol>
+<li>主业务响应延迟太大，比如12306下订单太慢了。</li>
+<li>数据走到终态后，没有更新需求，只有读的需求，比如订单的完成状态。</li>
+<li>用户能够接受新旧数据分开查询，比如携程的订单查询30天之前的需要用手机号查询。</li>
+</ol>
+<p>判断冷热数据：</p>
+<ul>
+<li><strong>时间维度</strong>，可以将3个月之前的数据定义为冷数据，最近3个月的数据定义为热数据。</li>
+<li><strong>状态维度</strong>，比如订单的状态，已完结的订单定义为冷数据，未完结的订单定义为热数据。</li>
+</ul>
+<p>要求：</p>
+<ol>
+<li>如果一个数据被标识为冷数据，业务代码不会再对它进行写操作</li>
+<li>不会同时存在读冷&#x2F;热数据的需求。</li>
+</ol>
+<h2 id="分离方案"><a href="#分离方案" class="headerlink" title="分离方案"></a>分离方案</h2><h3 id="业务代码修改——依据状态"><a href="#业务代码修改——依据状态" class="headerlink" title="业务代码修改——依据状态"></a>业务代码修改——依据状态</h3><p>这种方案是直接修改业务代码，对代码的侵入性比较高，无法按照时间进行区分，在数据修改时触发冷热分离。</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220407200406844.png" alt="图片"></p>
+<h3 id="监听数据库日志——依据状态"><a href="#监听数据库日志——依据状态" class="headerlink" title="监听数据库日志——依据状态"></a>监听数据库日志——依据状态</h3><p>该种方案需要监听<strong>binlog</strong>日志的方式进行触发，比如订单状态修改了，则触发冷热分离。</p>
+<p>同样的这里<strong>无法按照时间区分</strong>，<strong>但是对代码无侵入</strong>。</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220407200441298.png" alt="图片"></p>
+<h3 id="定时任务扫描——依据状态、时间"><a href="#定时任务扫描——依据状态、时间" class="headerlink" title="定时任务扫描——依据状态、时间"></a>定时任务扫描——依据状态、时间</h3><p>该种方案可以按照<strong>时间</strong>区分，与业务代码解耦，是个不错的选择。</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220407200457560.png" alt="图片"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BC%98%E5%8C%96/" data-id="cliribsxa0007hlsze8wf8bpq" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/事务" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BA%8B%E5%8A%A1/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.549Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%BA%8B%E5%8A%A1/" data-id="cliribsx90006hlsz9mto66fa" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/mysql" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.548Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>12345678</p>
+<p>show create table settle_merchant_opt_log</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> wx_account (</span><br><span class="line">  `id` <span class="type">bigint</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  `appid` <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">  `secret` <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">not</span> <span class="keyword">null</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">  `ctime` datetime <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">  `mtime` datetime <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> <span class="keyword">UPDATE</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;更新时间&#x27;</span>,</span><br><span class="line">  `is_delete` tinyint(<span class="number">4</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;是否删除 0否 1是&#x27;</span>,</span><br><span class="line">  <span class="keyword">PRIMARY</span> KEY (id),</span><br><span class="line">  KEY `ix_mtime` (`mtime`) <span class="keyword">USING</span> BTREE,</span><br><span class="line">  KEY `ix_appid` (`appid`) <span class="keyword">USING</span> BTREE</span><br><span class="line">)ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">0</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;微信公众号&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `settle_order` (</span><br><span class="line">`id` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;ID&#x27;</span>,</span><br><span class="line">`order_id` <span class="type">bigint</span>(<span class="number">20</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;订单ID&#x27;</span>,</span><br><span class="line">`shop_id` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;商户ID&#x27;</span>,</span><br><span class="line">`pro_id` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;项目ID&#x27;</span>,</span><br><span class="line">`ref_id` <span class="type">bigint</span>(<span class="number">20</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;业务方退款ID&#x27;</span>,</span><br><span class="line">`v_shop_id` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;虚拟店铺ID&#x27;</span>,</span><br><span class="line">`count` <span class="type">int</span>(<span class="number">11</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;sku总数量&#x27;</span>,</span><br><span class="line">`refund_id` <span class="type">varchar</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;退款ID&#x27;</span>,</span><br><span class="line">`biz` tinyint(<span class="number">4</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;业务方: 1-票务, 2-电商, 3-采购&#x27;</span>,</span><br><span class="line">`type` tinyint(<span class="number">4</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;交易类型: 1-普通订单, 2-拼团订单, 3-退款订单&#x27;</span>,</span><br><span class="line">`express` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;运费&#x27;</span>,</span><br><span class="line">`verify` tinyint(<span class="number">4</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;对账状态: 0-未对账, 1-对账成功, 2-对账失败&#x27;</span>,</span><br><span class="line">`share` tinyint(<span class="number">4</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;分账状态: 0-待处理, 1-处理中, 2-成功, 3-失败, 4-无需处理, 10-线下处理, 20-待确认&#x27;</span>,</span><br><span class="line">`cash_status` tinyint(<span class="number">4</span>) unsigned <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;提现状态: 0-待处理, 1-处理中, 2-成功, 3-失败, 4-无需处理, 10-线下处理&#x27;</span>,</span><br><span class="line">`pay_way` <span class="type">varchar</span>(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;支付方式&#x27;</span>,</span><br><span class="line">`goods_money` <span class="type">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;商品总额&#x27;</span>,</span><br><span class="line">`share_money` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;分账金额&#x27;</span>,</span><br><span class="line">`account_id` <span class="type">varchar</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;分账账户&#x27;</span>,</span><br><span class="line">`pay_money` <span class="type">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;实付金额&#x27;</span>,</span><br><span class="line">`pay_fee` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;支付手续费&#x27;</span>,</span><br><span class="line">`ref_fee` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;退款手续费&#x27;</span>,</span><br><span class="line">`pay_id` <span class="type">varchar</span>(<span class="number">32</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span> COMMENT <span class="string">&#x27;支付ID&#x27;</span>,</span><br><span class="line">`pay_time` <span class="type">timestamp</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0000-00-00 00:00:00&#x27;</span> COMMENT <span class="string">&#x27;支付时间&#x27;</span>,</span><br><span class="line">`entry_time` <span class="type">timestamp</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;完成时间&#x27;</span>,</span><br><span class="line">`ctime` <span class="type">timestamp</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span>,</span><br><span class="line">`mtime` <span class="type">timestamp</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> <span class="keyword">ON</span> <span class="keyword">UPDATE</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;更新时间&#x27;</span>,</span><br><span class="line">`express_discount` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;运费卷折扣&#x27;</span>,</span><br><span class="line">`merchant_id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;0&#x27;</span> COMMENT <span class="string">&#x27;商家平台的商家id&#x27;</span>,</span><br><span class="line"><span class="keyword">PRIMARY</span> KEY (`id`),</span><br><span class="line">KEY `ix_ctime` (`ctime`),</span><br><span class="line">KEY `ix_mtime` (`mtime`),</span><br><span class="line">KEY `ix_pro_id_share` (`pro_id`,`share`),</span><br><span class="line">KEY `ix_payid_refid_biz` (`pay_id`,`ref_id`,`biz`),</span><br><span class="line">KEY `ix_order_shop_ref_biz` (`order_id`,`shop_id`,`ref_id`,`biz`),</span><br><span class="line">KEY `ix_merchant_id_biz` (`merchant_id`,`biz`)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB AUTO_INCREMENT<span class="operator">=</span><span class="number">799196</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;结算订单&#x27;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">supplierCode</span><br><span class="line"></span><br><span class="line">supplier_code</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/" data-id="cliribsx80004hlsz9wh99uy0" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/主从相关" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%BB%E4%BB%8E%E7%9B%B8%E5%85%B3/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.548Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/e7g4J5G78RS0IC_ig4jcBg">京东二面：MySQL 主从延迟，读写分离 7 种解决方案 (qq.com)</a>，感觉写的有点水</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg2NzYyNjQzNg==&mid=2247491111&idx=1&sn=202d8dcb3e551039c129ac673414559b&scene=21#wechat_redirect">京东一面：MySQL 主备延迟有哪些坑？主备切换策略 (qq.com)</a></p>
+<h1 id="主库不可用，主备切换有哪些策略"><a href="#主库不可用，主备切换有哪些策略" class="headerlink" title="主库不可用，主备切换有哪些策略"></a>主库不可用，主备切换有哪些策略</h1><h2 id="1、可靠优先"><a href="#1、可靠优先" class="headerlink" title="1、可靠优先"></a><strong>1、可靠优先</strong></h2><p>切换过程中，拒绝一切写操作，这样可以保证 slave上线后，是 master的完整复制</p>
+<p>缺点：</p>
+<p>中间有个阶段，A库和B库都是只读状态，此时系统对外不能提供写服务。</p>
+<h2 id="2、可用优先"><a href="#2、可用优先" class="headerlink" title="2、可用优先"></a><strong>2、可用优先</strong></h2><p>当然我们也可以不用等主备数据同步完成，在一开始时就直接将流量切到备库。</p>
+<p>这样备库的流量就可能有两个来源：</p>
+<ul>
+<li>主库之前的剩余流量 binlog</li>
+<li>客户端新请求进来的流量</li>
+</ul>
+<p>两部分流量冲击，会对 <code>数据一致性</code> 造成一些影响。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E4%B8%BB%E4%BB%8E%E7%9B%B8%E5%85%B3/" data-id="cliribsx90005hlsz3afxfgbn" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/SQL/连接查询" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.547Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV12b411K7Zu?p=331">https://www.bilibili.com/video/BV12b411K7Zu?p=331</a></p>
+<h1 id="左外连接"><a href="#左外连接" class="headerlink" title="左外连接"></a>左外连接</h1><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202164918063.png" alt="image-20211202164918063"></p>
+<p>取A表全集，加上B表能够关联上的部分。</p>
+<p>比如，B表的字段可能比A表多</p>
+<h2 id="左外连接取差"><a href="#左外连接取差" class="headerlink" title="左外连接取差"></a>左外连接取差</h2><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165402137.png" alt="image-20211202165402137"></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 列出门派弟子</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t_emp a <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> t_dept b <span class="keyword">ON</span> a.id<span class="operator">=</span> b.CEO</span><br><span class="line"><span class="keyword">WHERE</span> b.CEO <span class="keyword">IS</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="右外连接"><a href="#右外连接" class="headerlink" title="右外连接"></a>右外连接</h1><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165041771.png" alt="image-20211202165041771"></p>
+<p>很少用到右外连接，主要用左外连接</p>
+<h2 id="右外连接取差"><a href="#右外连接取差" class="headerlink" title="右外连接取差"></a>右外连接取差</h2><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165451839.png" alt="image-20211202165451839"></p>
+<h1 id="内连接"><a href="#内连接" class="headerlink" title="内连接"></a>内连接</h1><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165247360.png" alt="image-20211202165247360"></p>
+<p>取交集</p>
+<p>不知道字段是否也会取交集</p>
+<h1 id="全连接"><a href="#全连接" class="headerlink" title="全连接"></a>全连接</h1><p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165512579.png" alt="image-20211202165512579"></p>
+<p>mysql没有全连接，可以使用 <strong>左外连接</strong>+<strong>右外连接取差</strong>，拼起来</p>
+<p><img src="/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2.assets/image-20211202165600651.png" alt="image-20211202165600651"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/" data-id="cliribsxh000jhlsz875xdih2" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/SQL/练习" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.527Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><h2 id="表名、列名不能加单引号"><a href="#表名、列名不能加单引号" class="headerlink" title="表名、列名不能加单引号"></a>表名、列名不能加单引号</h2><p>运行不了</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">&#x27;t_dept&#x27;</span> (</span><br><span class="line">	<span class="string">&#x27;id&#x27;</span> <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	<span class="string">&#x27;deptName&#x27;</span> <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="string">&#x27;address&#x27;</span> <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (<span class="string">&#x27;id&#x27;</span>)</span><br><span class="line">	)</span><br></pre></td></tr></table></figure>
+
+<p>修改后</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>不是用单引号，而是用键盘左上角的符号 &#96; </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="针对join的练习"><a href="#针对join的练习" class="headerlink" title="针对join的练习"></a>针对join的练习</h1><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV12b411K7Zu?p=331">https://www.bilibili.com/video/BV12b411K7Zu?p=331</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br><span class="line">	</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">table</span> t_emp(</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">not</span> <span class="keyword">null</span> auto_increment,</span><br><span class="line">	`name` <span class="type">varchar</span>(<span class="number">20</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	age <span class="type">int</span>(<span class="number">3</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	deptid <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	empno <span class="type">int</span> <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	<span class="keyword">primary</span> key (id),</span><br><span class="line">	key idx_dept_id (deptid)</span><br><span class="line">	#<span class="keyword">constraint</span> fk_dept_id <span class="keyword">foreign</span> key (deptid) <span class="keyword">references</span> t_dept (id)</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t_dept(deptName, address) <span class="keyword">values</span>(<span class="string">&#x27;华山&#x27;</span>, <span class="string">&#x27;华山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;丐帮&#x27;</span>,<span class="string">&#x27;洛阳&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;峨眉&#x27;</span>,<span class="string">&#x27;峨眉山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;武当&#x27;</span>,<span class="string">&#x27;武当山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;明教&#x27;</span>,<span class="string">&#x27;光明顶&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;少林&#x27;</span>,<span class="string">&#x27;少林寺&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;风清扬&#x27;</span>,<span class="number">90</span>,<span class="number">1</span>,<span class="number">100001</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;岳不群&#x27;</span>,<span class="number">50</span>,<span class="number">1</span>,<span class="number">100002</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;令狐冲&#x27;</span>,<span class="number">24</span>,<span class="number">1</span>,<span class="number">100003</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;洪七公&#x27;</span>,<span class="number">70</span>,<span class="number">2</span>,<span class="number">100004</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;乔峰&#x27;</span>,<span class="number">35</span>,<span class="number">2</span>,<span class="number">100005</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;灭绝师太&#x27;</span>,<span class="number">70</span>,<span class="number">3</span>,<span class="number">100006</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;周芷若&#x27;</span>,<span class="number">20</span>,<span class="number">3</span>,<span class="number">100007</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;张三丰&#x27;</span>,<span class="number">100</span>,<span class="number">4</span>,<span class="number">100008</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;张无忌&#x27;</span>,<span class="number">25</span>,<span class="number">5</span>,<span class="number">100009</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;韦小宝&#x27;</span>,<span class="number">18</span>,<span class="keyword">null</span>,<span class="number">100010</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> `t_dept`</span><br><span class="line"><span class="keyword">add</span>  CEO  <span class="type">INT</span>(<span class="number">11</span>)  ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">2</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">4</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">6</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">3</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">8</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">4</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">9</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="表"><a href="#表" class="headerlink" title="表"></a>表</h2><h3 id="门派表"><a href="#门派表" class="headerlink" title="门派表"></a>门派表</h3><p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204215223502.png" alt="image-20211204215223502"></p>
+<h3 id="人员表"><a href="#人员表" class="headerlink" title="人员表"></a>人员表</h3><p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png" alt="image-20211204212637520"></p>
+<h2 id="所有有门派的人员信息"><a href="#所有有门派的人员信息" class="headerlink" title="所有有门派的人员信息"></a>所有有门派的人员信息</h2><p>( A、B两表共有)内连接</p>
+<p>inner join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="列出所有用户，并显示其机构信息"><a href="#列出所有用户，并显示其机构信息" class="headerlink" title="列出所有用户，并显示其机构信息"></a>列出所有用户，并显示其机构信息</h2><p>(A的全集)左外连接</p>
+<p>left join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="列出所有门派"><a href="#列出所有门派" class="headerlink" title="列出所有门派"></a>列出所有门派</h2><p>(B的全集)右外连接</p>
+<p>right join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="差集——所有不入门派的人员"><a href="#差集——所有不入门派的人员" class="headerlink" title="差集——所有不入门派的人员"></a>差集——所有不入门派的人员</h2><p>（A的差集）左外连接取差</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="差集——所有没人入的门派"><a href="#差集——所有没人入的门派" class="headerlink" title="差集——所有没人入的门派"></a>差集——所有没人入的门派</h2><p>（B的差集）右外连接取差</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203232005311.png" alt="image-20211203232005311"></p>
+<h2 id="列出所有人员和机构的对照关系"><a href="#列出所有人员和机构的对照关系" class="headerlink" title="列出所有人员和机构的对照关系."></a>列出所有人员和机构的对照关系.</h2><p>（全连接）union，会去重</p>
+<p>mysql没有全连接，可以使用 <strong>左外连接</strong>+<strong>右外连接取差</strong>，拼起来</p>
+<p>使用<strong>左外连接</strong>+<strong>右外连接</strong>也可以：但是这种写法要注意，union all会出现重复</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">union</span></span><br><span class="line"><span class="keyword">select</span> a.<span class="operator">*</span>,b.<span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203232747394.png" alt="image-20211203232747394"></p>
+<p>使用 union all，不会去重</p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203233006849.png" alt="image-20211203233006849"></p>
+<h2 id="列出所有没入派的人员-和没人入的派"><a href="#列出所有没入派的人员-和没人入的派" class="headerlink" title="列出所有没入派的人员 和没人入的派"></a>列出所有没入派的人员 和没人入的派</h2><p>差集</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">union</span></span><br><span class="line"><span class="keyword">select</span> a.<span class="operator">*</span>,b.<span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">where</span> a.id <span class="keyword">is</span> <span class="keyword">null</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="针对join的拓展练习1"><a href="#针对join的拓展练习1" class="headerlink" title="针对join的拓展练习1"></a>针对join的拓展练习1</h2><h3 id="求各个门派对应的掌门人名称"><a href="#求各个门派对应的掌门人名称" class="headerlink" title="求各个门派对应的掌门人名称"></a>求各个门派对应的掌门人名称</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.name <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.CEO<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="求所有当上掌门人的平均年龄"><a href="#求所有当上掌门人的平均年龄" class="headerlink" title="求所有当上掌门人的平均年龄"></a>求所有当上掌门人的平均年龄</h3><p>感悟对列的操作：相当于是对整列进行操作，所以最终得到的结果只有一行</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">avg</span>(b.age) <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.CEO<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203234201626.png" alt="image-20211203234201626"></p>
+<h3 id="求所有人物对应的掌门名称"><a href="#求所有人物对应的掌门名称" class="headerlink" title="求所有人物对应的掌门名称:"></a>求所有人物对应的掌门名称:</h3><p><strong>首先是查询到所有门派的掌门</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.id <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo</span><br></pre></td></tr></table></figure>
+
+<p>将查询结果作为一个表b，join起来。join的时候，表b的列，即为表b的查询结果<code>a.name,b.id</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.name <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span>	(<span class="keyword">select</span> a.name,b.id <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line">	<span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<p>但是写法有很多：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.`name`, b.deptName, c.name <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">on</span> b.CEO<span class="operator">=</span>c.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="拓展练习2"><a href="#拓展练习2" class="headerlink" title="拓展练习2"></a>拓展练习2</h2><p>能直接关联就直接关联，不要引入子查询</p>
+<h3 id="列出自己的掌门比自己年龄大的人员"><a href="#列出自己的掌门比自己年龄大的人员" class="headerlink" title="列出自己的掌门比自己年龄大的人员"></a>列出自己的掌门比自己年龄大的人员</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name <span class="keyword">as</span> empName,a.age <span class="keyword">as</span> empAge,c.name <span class="keyword">as</span> CEOName,c.age <span class="keyword">as</span> CEOAge  <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">on</span> b.CEO<span class="operator">=</span>c.id</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&lt;</span>c.age</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h3 id="列出所有年龄低于自己门派平均年龄的人员"><a href="#列出所有年龄低于自己门派平均年龄的人员" class="headerlink" title="列出所有年龄低于自己门派平均年龄的人员"></a>列出所有年龄低于自己门派平均年龄的人员</h3><p>对查询进行拆分：</p>
+<ol>
+<li>门派的平均年龄，得到一个虚拟的表virtual</li>
+<li>t_emp要join 那个virtual</li>
+</ol>
+<p>门派的平均年龄：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptid,<span class="built_in">AVG</span>(a.age) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br></pre></td></tr></table></figure>
+
+<p>整合：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.deptid,<span class="built_in">AVG</span>(a.age) <span class="keyword">as</span> avg <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.deptid</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&lt;</span>b.avg</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) a, customer_store_id <span class="keyword">from</span> customer_store_goods </span><br><span class="line"><span class="keyword">where</span> (<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) a, customer_store_id <span class="keyword">from</span> customer_store_goods <span class="keyword">where</span> a<span class="operator">&gt;</span><span class="number">20</span> <span class="keyword">group</span> <span class="keyword">by</span> customer_store_id) <span class="operator">&gt;</span><span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+<p>注意group by的用法，他对数据进行分组，如何显示分组后的数据：</p>
+<ol>
+<li><p>如果使用了函数，如avg()，则会显示这个分组对应的计算结果。如下面的AVG(a.age)</p>
+</li>
+<li><p>如果没有使用函数，则会返回这组数据的第一个。如下面的name</p>
+</li>
+</ol>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212552284.png" alt="image-20211204212552284"></p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png" alt="image-20211204212637520"></p>
+<h3 id="列出至少有2个年龄大于40岁的成员的门门派"><a href="#列出至少有2个年龄大于40岁的成员的门门派" class="headerlink" title="列出至少有2个年龄大于40岁的成员的门门派"></a>列出至少有2个年龄大于40岁的成员的门门派</h3><p>写法有很多种</p>
+<h4 id="写法一"><a href="#写法一" class="headerlink" title="写法一"></a>写法一</h4><ol>
+<li>算出 t_emp中，每个门派，年龄 &gt; 40的人数，并筛选出人数多于1的</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptid,<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：因为对 group by之后的数据进行筛选，就需要 <strong>having</strong></p>
+<ol start="2">
+<li>与t_dept 进行 inner join</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptName,b.count <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.deptid <span class="keyword">as</span> dept,<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">as</span> count <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span>) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.dept</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204214455861.png" alt="image-20211204214455861"></p>
+<h4 id="写法二"><a href="#写法二" class="headerlink" title="写法二"></a>写法二</h4><p>不用子查询，直接两个表级联</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注意： join，相当于是将两个表级联成一个表，on是级联的条件。此时where必须要在 on之后，否则会报错</p>
+<h3 id="至少有2位非掌门人成员的门派"><a href="#至少有2位非掌门人成员的门派" class="headerlink" title="至少有2位非掌门人成员的门派"></a>至少有2位非掌门人成员的门派</h3><ol>
+<li>对t_emp 与 t_dept进行 inner join，得到弟子表</li>
+<li>进行group by</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.deptName, <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id <span class="keyword">and</span> a.id<span class="operator">!=</span>b.CEO</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204215737513.png" alt="image-20211204215737513"></p>
+<h3 id="列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”"><a href="#列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”" class="headerlink" title="列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”"></a>列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”</h3><p>对于条件判断的运用</p>
+<ol>
+<li>对 t_emp 与 t_dept进行 left join</li>
+<li>判断 a.id&#x3D;b.CEO</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name, a.age, b.deptName, (<span class="keyword">case</span> <span class="keyword">when</span> a.id<span class="operator">=</span>b.CEO <span class="keyword">then</span> <span class="string">&#x27;是&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;否&#x27;</span> <span class="keyword">end</span>) <span class="keyword">as</span> <span class="string">&#x27;是否为掌门&#x27;</span></span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br></pre></td></tr></table></figure>
+
+<p>注：case的语法</p>
+<h3 id="列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄-gt-50显示“老鸟”"><a href="#列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄-gt-50显示“老鸟”" class="headerlink" title="列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄&gt;50显示“老鸟”"></a>列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄&gt;50显示“老鸟”</h3><ol>
+<li>对 t_emp 与 t_dept进行 inner join</li>
+<li>根据 b.id进行group by</li>
+<li>对 group by进行 avg(a.age)，并判断</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.id, b.deptName, <span class="built_in">avg</span>(a.age), <span class="built_in">count</span>(<span class="operator">*</span>), if(<span class="built_in">avg</span>(a.age)<span class="operator">&gt;</span><span class="number">50</span>, <span class="string">&#x27;老鸟&#x27;</span>,<span class="string">&#x27;菜鸟&#x27;</span>) <span class="keyword">as</span> <span class="string">&#x27;老鸟or菜鸟&#x27;</span></span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br></pre></td></tr></table></figure>
+
+<p>注：if的语法</p>
+<h3 id="显示每个门门派年龄最大的人"><a href="#显示每个门门派年龄最大的人" class="headerlink" title="显示每个门门派年龄最大的人"></a>显示每个门门派年龄最大的人</h3><ol>
+<li>根据 a.deptid进行group by，并计算出其中年龄的最大值</li>
+<li>使用t_emp再进行一次关联</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.id, a.deptid, <span class="built_in">max</span>(a.age) <span class="keyword">as</span> maxAge</span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="显示每个门门派年龄第二大的人"><a href="#显示每个门门派年龄第二大的人" class="headerlink" title="显示每个门门派年龄第二大的人"></a>显示每个门门派年龄第二大的人</h3><p>需要用到自定义参数</p>
+<ol>
+<li>根据 a.deptid, a.age，对t_emp进行排序</li>
+<li>对排序结果进行赋值，得到新的表 virtual</li>
+<li>对virtual进行筛选判断</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="variable">@rank</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="variable">@last_deptid</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="variable">@last_age</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span>(<span class="keyword">select</span> <span class="operator">*</span>, </span><br><span class="line">		if(a.deptid<span class="operator">=</span><span class="variable">@last_deptid</span>, </span><br><span class="line">			if(a.age<span class="operator">=</span><span class="variable">@last_age</span>, <span class="variable">@rank</span>, <span class="variable">@rank</span>:<span class="operator">=</span><span class="variable">@rank</span><span class="operator">+</span><span class="number">1</span>) ,<span class="variable">@rank</span>:<span class="operator">=</span><span class="number">1</span> ) <span class="keyword">as</span> rk, </span><br><span class="line">		<span class="variable">@last_deptid</span>:<span class="operator">=</span>a.deptid <span class="keyword">as</span> last_deptid, </span><br><span class="line">        <span class="variable">@last_age</span>:<span class="operator">=</span>a.age <span class="keyword">as</span> last_age</span><br><span class="line">	<span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span> a.deptid, a.age <span class="keyword">desc</span>) <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.rk<span class="operator">=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注：自定义参数</p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211230203912618.png" alt="image-20211230203912618"></p>
+<p>注意上图的查询结果，有rk、last_deptid、last_age这三列</p>
+<h1 id="海量数据"><a href="#海量数据" class="headerlink" title="海量数据"></a>海量数据</h1><h2 id="创建数据"><a href="#创建数据" class="headerlink" title="创建数据"></a>创建数据</h2><h3 id="创建表："><a href="#创建表：" class="headerlink" title="创建表："></a>创建表：</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept(</span><br><span class="line">	id <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	ceo <span class="type">INT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">) ENGINE<span class="operator">=</span>INNODB AUTO_INCREMENT<span class="operator">=</span><span class="number">1</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp(</span><br><span class="line">	id <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	empno <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	name <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	age <span class="type">INT</span>(<span class="number">3</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	deptId <span class="type">INT</span> (<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">	#<span class="keyword">CONSTRAINT</span> fk_dept_id <span class="keyword">FOREIGN</span> KEY (deptId) <span class="keyword">REFERENCES</span> t_dept(id)</span><br><span class="line">)ENGINE<span class="operator">=</span>INNODB AUTO_INCREMENT<span class="operator">=</span><span class="number">1</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="填充数据"><a href="#填充数据" class="headerlink" title="填充数据"></a>填充数据</h3><p>主从复制，使用bin.log，<a target="_blank" rel="noopener" href="https://blog.csdn.net/y_zilong/article/details/116950207">MySQL的主从复制_y_zilong的博客-CSDN博客_mysql主从复制</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#mysql为避免主从复制出现不一致的问题，会默认关闭用户自定义函数</span><br><span class="line">#不一致，比如：master使用了系统时间，slave也使用系统时间，就会出现不一致</span><br><span class="line">SHOW VARIABLES LIKE &#x27;log_bin_trust_function_creators&#x27;;</span><br><span class="line"></span><br><span class="line">#用户想要自定义函数，就要打开开关</span><br><span class="line">SET GLOBAL log_bin_trust_function_creators=1;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>创建随机字符串：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> rand_string(n <span class="type">INT</span>) <span class="keyword">RETURNS</span> <span class="type">VARCHAR</span>(<span class="number">255</span>)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> chars_str <span class="type">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;abcdefghijklmnopqrstuvwxyzABCDEFJHIJKLMNOPQRSTUVWXYZ&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> return_str <span class="type">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	WHILE i <span class="operator">&lt;</span> n DO</span><br><span class="line">		<span class="keyword">SET</span> return_str <span class="operator">=</span>CONCAT(return_str,<span class="built_in">SUBSTRING</span>(chars_str,<span class="built_in">FLOOR</span>(<span class="number">1</span> <span class="operator">+</span>RAND()<span class="operator">*</span><span class="number">52</span>),<span class="number">1</span>));</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span><span class="number">1</span>;</span><br><span class="line">	<span class="keyword">END</span> WHILE;</span><br><span class="line">	<span class="keyword">RETURN</span> return_str;</span><br><span class="line"><span class="keyword">END</span> $$</span><br></pre></td></tr></table></figure>
+
+
+
+<p>创建随机数字：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> rand_num (from_num <span class="type">INT</span> ,to_num <span class="type">INT</span>) <span class="keyword">RETURNS</span> <span class="type">INT</span>(<span class="number">11</span>)</span><br><span class="line"><span class="keyword">BEGIN</span> </span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">SET</span> i<span class="operator">=</span><span class="built_in">FLOOR</span>(from_num <span class="operator">+</span>RAND()<span class="operator">*</span>(to_num<span class="operator">-</span>from_num<span class="operator">+</span><span class="number">1</span>));</span><br><span class="line">	<span class="keyword">RETURN</span> i;</span><br><span class="line"><span class="keyword">END</span>$$</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>创建员工：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> insert_emp(start_num <span class="type">INT</span>, max_num <span class="type">INT</span>)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	#<span class="keyword">set</span> autocommit<span class="operator">=</span><span class="number">0</span>把autocommit设置成<span class="number">0</span></span><br><span class="line">	<span class="keyword">SET</span> autocommit<span class="operator">=</span> <span class="number">0</span>; </span><br><span class="line">	REPEAT</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span><span class="number">1</span>;</span><br><span class="line">		<span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp (empno, name ,age ,deptid ) <span class="keyword">VALUES</span> ((start_num<span class="operator">+</span>i) ,rand_string(<span class="number">6</span>), rand_num(<span class="number">30</span>,<span class="number">50</span>),rand_num(<span class="number">1</span>,<span class="number">10000</span>));</span><br><span class="line">		UNTIL i<span class="operator">=</span> max_num</span><br><span class="line">	<span class="keyword">END</span> REPEAT;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="keyword">CALL</span> insert_emp(<span class="number">100000</span>,<span class="number">500000</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>创建部门：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> insert_dept( max_num <span class="type">INT</span> )</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">SET</span> autocommit <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">	REPEAT</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span> <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">INSERT</span> <span class="keyword">INTO</span> dept ( deptname,address,ceo ) <span class="keyword">VALUES</span></span><br><span class="line">(rand_string(<span class="number">8</span>),rand_string(<span class="number">10</span>),rand_num(<span class="number">1</span> ,<span class="number">500000</span>));</span><br><span class="line">		UNTIL i <span class="operator">=</span> max_num</span><br><span class="line"><span class="keyword">END</span> REPEAT;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="keyword">CALL</span> insert_dept(<span class="number">10000</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>批量删除索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 批量删除索引</span><br><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> proc_drop_index (dbname <span class="type">VARCHAR</span>(<span class="number">200</span>),tablename <span class="type">VARCHAR</span>(<span class="number">200</span>))</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> done <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> ct <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> _index <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	#<span class="keyword">DECLARE</span> sql_str <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> _cur <span class="keyword">CURSOR</span> <span class="keyword">FOR</span> <span class="keyword">SELECT</span> INDEX_NAME <span class="keyword">FROM</span> information_schema.STATISTICS <span class="keyword">WHERE</span> TABLE_NAME<span class="operator">=</span>tablename <span class="keyword">AND</span> TABLE_SCHEMA<span class="operator">=</span><span class="string">&#x27;first&#x27;</span> <span class="keyword">AND</span> INDEX_NAME<span class="operator">&lt;&gt;</span><span class="string">&#x27;PRIMARY&#x27;</span> <span class="keyword">AND</span> SEQ_IN_INDEX<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> CONTINUE HANDLER <span class="keyword">FOR</span> <span class="keyword">NOT</span> FOUND <span class="keyword">set</span> done<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line">	<span class="keyword">OPEN</span> _cur;</span><br><span class="line">	<span class="keyword">FETCH</span> _cur <span class="keyword">INTO</span> _index;</span><br><span class="line">	WHILE _index<span class="operator">&lt;&gt;</span><span class="string">&#x27;&#x27;</span> DO</span><br><span class="line">		<span class="keyword">SET</span> <span class="variable">@str</span><span class="operator">=</span>CONCAT(<span class="string">&#x27;drop index&#x27;</span>, _index, <span class="string">&#x27;ON tablename&#x27;</span>);</span><br><span class="line">		<span class="keyword">PREPARE</span> sql_str <span class="keyword">FROM</span> <span class="variable">@str</span>;</span><br><span class="line">		<span class="keyword">EXECUTE</span> sql_str;</span><br><span class="line">		<span class="keyword">DEALLOCATE</span> <span class="keyword">PREPARE</span> sql_str;</span><br><span class="line">		<span class="keyword">SET</span> _index<span class="operator">=</span><span class="string">&#x27;&#x27;</span>;</span><br><span class="line">		<span class="keyword">FETCH</span> _cur <span class="keyword">INTO</span> _index;</span><br><span class="line">	<span class="keyword">END</span> WHILE;</span><br><span class="line"><span class="keyword">CLOSE</span> _cur;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line"><span class="keyword">CALL</span> proc_drop_index (<span class="string">&#x27;mydb&#x27;</span>, <span class="string">&#x27;emp&#x27;</span>) ;</span><br><span class="line"><span class="keyword">CALL</span> proc_drop_index (<span class="string">&#x27;mydb&#x27;</span>, <span class="string">&#x27;dept&#x27;</span>) ;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="开始分析"><a href="#开始分析" class="headerlink" title="开始分析"></a>开始分析</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/" data-id="cliribsxh000ihlszh6vofxfd" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/SQL/基础" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.520Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="范式"><a href="#范式" class="headerlink" title="范式"></a>范式</h1><p>第一范式-》第二范式，消除部分依赖</p>
+<p><img src="/%E5%9F%BA%E7%A1%80.assets/v2-7f7eebadb49ad8f4ce7ad6a4d81d5709_1440w.jpg" alt="img"></p>
+<p>年龄依赖于<strong>学号</strong>，成绩依赖于<strong>学号</strong>、<strong>课程</strong>。导致，年龄部分依赖于<strong>学号</strong>、<strong>课程</strong></p>
+<p>第二范式-》第三范式，消除传递依赖</p>
+<p><img src="/%E5%9F%BA%E7%A1%80.assets/v2-466f83a8405c42468650b362d28b72c5_1440w.jpg" alt="img"></p>
+<p>学院依赖于<strong>学号</strong>，学院电话依赖于<strong>学院</strong>。导致，学院电话传递依赖于<strong>学号</strong></p>
+<h2 id="函数依赖"><a href="#函数依赖" class="headerlink" title="函数依赖"></a>函数依赖</h2><h3 id="完全函数依赖"><a href="#完全函数依赖" class="headerlink" title="完全函数依赖"></a>完全函数依赖</h3><p>{学号,课号}–&gt;成绩</p>
+<p> <strong>学号+课号</strong> 可以决定 <strong>成绩</strong> 但只有学号or只有课号无法决定<strong>成绩</strong> </p>
+<h3 id="部分函数依赖"><a href="#部分函数依赖" class="headerlink" title="部分函数依赖"></a>部分函数依赖</h3><p>{学号,课号}–&gt;姓名   </p>
+<p>只有学号就能决定<strong>姓名</strong>  (课号是冗余的) </p>
+<h3 id="平凡函数依赖"><a href="#平凡函数依赖" class="headerlink" title="平凡函数依赖"></a>平凡函数依赖</h3><p>在一个职工关系中，职工号总能函数决定它本身，记作“职工号→职工号”，对于任一个给定的职工号，都有它本身的职工号值唯一对应，此为平凡函数依赖。</p>
+<h2 id="范式-1"><a href="#范式-1" class="headerlink" title="范式"></a>范式</h2><h3 id="一范式"><a href="#一范式" class="headerlink" title="一范式"></a>一范式</h3><p>要求：每一个分量必须是不可分的数据项。</p>
+<p>特点：</p>
+<ol>
+<li><p>有主键，且主键不能为空。</p>
+</li>
+<li><p>字段不能再分。</p>
+</li>
+</ol>
+<h3 id="二范式"><a href="#二范式" class="headerlink" title="二范式"></a>二范式</h3><p>要求：在范式一的基础上，且每一个非主属性完全函数依赖于码。</p>
+<p>特点：</p>
+<ol>
+<li><p>满足第一范式。</p>
+</li>
+<li><p>表中的每一个非主属性，必须完全依赖于本表码。（&#x3D;&#x3D;消除部分依赖&#x3D;&#x3D;）</p>
+</li>
+</ol>
+<p>当，表中的主码，由两个或以上的属性组成的时候，才会出现不符合第二范式的情况。</p>
+<h3 id="第三范式-3NF"><a href="#第三范式-3NF" class="headerlink" title="第三范式 3NF"></a>第三范式 3NF</h3><p>要求：在满足第二范式的基础上，且每一个非主属性既<strong>不部分依赖</strong>于码也<strong>不传递依赖</strong>于码。</p>
+<p>特点：</p>
+<ol>
+<li><p>满足第二范式。</p>
+</li>
+<li><p>非主属性不能传递依赖于码。（&#x3D;&#x3D;消除传递依赖&#x3D;&#x3D;）</p>
+</li>
+</ol>
+<blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;学号     系别     系主任</span><br><span class="line">&gt;Sno     Sdept     Shead</span><br><span class="line">&gt;1001   计算机系    张三</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>主键：Sno</p>
+<p>不满足原因：Shead传递依赖于码，<code>Sno-&gt;Sdept</code>，<code>Sdept-&gt;Shead</code>，可得<code>Sno-&gt;Shead</code>。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" data-id="cliribsxg000hhlszck9dhk4b" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/SQL/函数" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.518Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="批量更新时使用-when、then"><a href="#批量更新时使用-when、then" class="headerlink" title="批量更新时使用 when、then"></a>批量更新时使用 when、then</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> city</span><br><span class="line">     <span class="keyword">set</span> longitude <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000794</span> <span class="keyword">then</span> <span class="number">121.4736580000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">125.3235700000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">120.3829900000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">113.2643850000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">113.1219200000</span></span><br><span class="line">                    <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">104.0647600000</span></span><br><span class="line">                <span class="keyword">end</span>),</span><br><span class="line">          latitude <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span><span class="number">000794</span> <span class="keyword">then</span> <span class="number">31.2303780000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">43.8160200000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">36.0662300000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">23.1291120000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">23.0218500000</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">30.5702000000</span></span><br><span class="line">                 <span class="keyword">end</span>),</span><br><span class="line">          opened <span class="operator">=</span> (<span class="keyword">case</span> <span class="keyword">when</span> city_code <span class="operator">=</span><span class="number">000794</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">000582</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001373</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">001957</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002000</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                     <span class="keyword">when</span> city_code <span class="operator">=</span> <span class="number">002293</span> <span class="keyword">then</span> <span class="number">1</span></span><br><span class="line">                 <span class="keyword">end</span>)</span><br><span class="line">   <span class="keyword">where</span> city_code <span class="keyword">in</span> (<span class="number">000794</span>,<span class="number">000582</span>,<span class="number">001373</span>,<span class="number">001957</span>,<span class="number">002000</span>,<span class="number">002293</span>);</span><br><span class="line">   </span><br><span class="line"> <span class="number">1</span> <span class="operator">&lt;</span><span class="keyword">update</span> id<span class="operator">=</span>&quot;updateChartParamByAccountAndChartid&quot; parameterType<span class="operator">=</span>&quot;list&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">2</span>         <span class="keyword">update</span> followme_parameters</span><br><span class="line"> <span class="number">3</span>         <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;set&quot; suffixOverrides<span class="operator">=</span>&quot;,&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">4</span>             <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;signal_source =case&quot; suffix<span class="operator">=</span>&quot;end,&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">5</span>                 <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">6</span>                     <span class="operator">&lt;</span>if test<span class="operator">=</span>&quot;item.signalSource!=null&quot;<span class="operator">&gt;</span></span><br><span class="line"> <span class="number">7</span>                         <span class="keyword">when</span> account<span class="operator">=</span>#&#123;item.account&#125; <span class="keyword">and</span> chart_id<span class="operator">=</span>#&#123;item.chartId&#125;</span><br><span class="line"> <span class="number">8</span>                          <span class="keyword">then</span> #&#123;item.signalSource&#125;</span><br><span class="line"> <span class="number">9</span>                     <span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br><span class="line"><span class="number">10</span>                 <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">11</span>             <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">12</span>             <span class="operator">&lt;</span>trim prefix<span class="operator">=</span>&quot;rate =case&quot; suffix<span class="operator">=</span>&quot;end,&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">13</span>                 <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">14</span>                     <span class="operator">&lt;</span>if test<span class="operator">=</span>&quot;item.rate!=null&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">15</span>                         <span class="keyword">when</span> account<span class="operator">=</span>#&#123;item.account&#125; <span class="keyword">and</span> chart_id<span class="operator">=</span>#&#123;item.chartId&#125;</span><br><span class="line"><span class="number">16</span>                         <span class="keyword">then</span> #&#123;item.rate&#125;</span><br><span class="line"><span class="number">17</span>                     <span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br><span class="line"><span class="number">18</span>                 <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">19</span>             <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">20</span>         <span class="operator">&lt;</span><span class="operator">/</span>trim<span class="operator">&gt;</span></span><br><span class="line"><span class="number">21</span>         <span class="keyword">where</span> id <span class="keyword">in</span></span><br><span class="line"><span class="number">22</span>         <span class="operator">&lt;</span>foreach collection<span class="operator">=</span>&quot;list&quot; item<span class="operator">=</span>&quot;item&quot; index<span class="operator">=</span>&quot;index&quot; separator<span class="operator">=</span>&quot;,&quot; <span class="keyword">open</span><span class="operator">=</span>&quot;(&quot; <span class="keyword">close</span><span class="operator">=</span>&quot;)&quot;<span class="operator">&gt;</span></span><br><span class="line"><span class="number">23</span>             #&#123;item.id&#125;</span><br><span class="line"><span class="number">24</span>         <span class="operator">&lt;</span><span class="operator">/</span>foreach<span class="operator">&gt;</span></span><br><span class="line"><span class="number">25</span>     <span class="operator">&lt;</span><span class="operator">/</span><span class="keyword">update</span><span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%87%BD%E6%95%B0/" data-id="cliribsxg000ghlszfqtmcitu" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/SQL/优化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.517Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>在进行优化时，将外关联，变为内关联，是因为可以减少执行引擎执行的次数，降低存储引擎读取的次数</p>
+<h1 id="大表优化"><a href="#大表优化" class="headerlink" title="大表优化"></a>大表优化</h1><p>当MySQL单表记录数过大时，数据库的性能会明显下降，一些常见的优化措施如下：</p>
+<ul>
+<li>限定数据的范围。比如：用户在查询历史信息的时候，可以控制在一个月的时间范围内；</li>
+<li>读写分离：经典的数据库拆分方案，主库负责写，从库负责读；</li>
+<li>通过分库分表的方式进行优化，主要有垂直拆分和水平拆分。</li>
+</ul>
+<h1 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/VZXunsXEWAdRr3bup7L9yA">聊聊分库分表 (qq.com)</a></p>
+<h2 id="瓶颈"><a href="#瓶颈" class="headerlink" title="瓶颈"></a>瓶颈</h2><h3 id="IO瓶颈"><a href="#IO瓶颈" class="headerlink" title="IO瓶颈"></a>IO瓶颈</h3><p>第一种：磁盘读IO瓶颈，热点数据太多，数据库缓存放不下，每次查询时会产生大量的IO，降低查询速度 -&gt; 分库和垂直分表。</p>
+<p>第二种：网络IO瓶颈，请求的数据太多，网络带宽不够 -&gt; 分库。</p>
+<h3 id="CPU瓶颈"><a href="#CPU瓶颈" class="headerlink" title="CPU瓶颈"></a>CPU瓶颈</h3><p><strong>第一种</strong>：SQL问题，如SQL中包含join，group by，order by，非索引字段条件查询等，增加CPU运算的操作 -&gt; SQL优化，建立合适的索引，在业务Service层进行业务计算。</p>
+<p><strong>第二种</strong>：单表数据量太大，查询时扫描的行太多，SQL效率低，CPU率先出现瓶颈 -&gt; 水平分表。</p>
+<h2 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h2><h3 id="水平分表"><a href="#水平分表" class="headerlink" title="水平分表"></a>水平分表</h3><p>IO未瓶颈，CPU瓶颈了</p>
+<p><strong>场景：</strong>系统绝对并发量并没有上来，只是单表的数据量太多，影响了SQL效率，加重了CPU负担，以至于成为瓶颈。</p>
+<p><strong>分析：</strong>表的数据量少了，单次SQL执行效率高，自然减轻了CPU的负担。</p>
+<h3 id="垂直分表"><a href="#垂直分表" class="headerlink" title="垂直分表"></a>垂直分表</h3><p>表内存在大量非热点数据的列，使得每次IO得到的有效数据较少</p>
+<p><strong>场景：</strong>系统绝对并发量并没有上来，表的记录并不多，但是字段多，并且热点数据和非热点数据在一起，<strong>单行数据所需的存储空间较大。以至于数据库缓存的数据行减少</strong>，查询时会去读磁盘数据产生大量的随机读IO，产生IO瓶颈。</p>
+<p>分表：可以用列表页和详情页来帮助理解。垂直分表的拆分原则是<strong>将热点数据（可能会冗余经常一起查询的数据）放在一起作为主表，非热点数据放在一起作为扩展表。</strong>这样更多的热点数据就能被缓存下来，进而减少了随机读IO。拆了之后，要想获得全部数据就需要关联两个表来取数据。</p>
+<p>但记住，千万别用join，因为join不仅会增加CPU负担并且会讲两个表耦合在一起（必须在一个数据库实例上）。<strong>关联数据，应该在业务Service层做文章</strong>，分别获取主表和扩展表数据然后用关联字段关联得到全部数据。</p>
+<h2 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h2><h3 id="水平分库"><a href="#水平分库" class="headerlink" title="水平分库"></a>水平分库</h3><p>网络IO瓶颈</p>
+<p><strong>分析：</strong>库多了，io和cpu的压力自然可以成倍缓解。</p>
+<h3 id="垂直分库"><a href="#垂直分库" class="headerlink" title="垂直分库"></a>垂直分库</h3><h1 id="explain"><a href="#explain" class="headerlink" title="explain"></a>explain</h1><p>使用EXPLAIN关键字可以模拟优化器执行SQL套询语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈</p>
+<p>用处：</p>
+<ul>
+<li>表的读取顺序</li>
+<li>哪些索引可以使用</li>
+<li>数据读取操作的操作类型</li>
+<li>哪些索引被实际使用</li>
+<li>表之间的引用</li>
+<li>每张表有多少行被物理查询</li>
+</ul>
+<h2 id="字段"><a href="#字段" class="headerlink" title="字段"></a>字段</h2><p>在查询中的每个表会输出一行，如果有两个表通过 join 连接查询，那么会输出两行。表的意义相当广泛：可以是子查询、一个 union 结果等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain select * from actor;</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br><span class="line">| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br><span class="line">|  1 | SIMPLE      | actor | ALL  | NULL          | NULL | NULL    | NULL |    2 | NULL  |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="id"><a href="#id" class="headerlink" title="id"></a>id</h3><p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204152205274.png" alt="image-20211204152205274"></p>
+<p>id表示执行的优先级，相当于权值，权值越大，优先级越高。</p>
+<p>id号每个号码，表示一趟独立的查询。一个sql的查询趟数越少越好。</p>
+<ul>
+<li>id相同，执行顺序由上至下</li>
+<li>id不同，如果是子查询，id的序号会递增，id值 越大优先级越高，越先被执行</li>
+<li>id相同不同，同时存在</li>
+<li></li>
+</ul>
+<h3 id="select-type-优化用不到"><a href="#select-type-优化用不到" class="headerlink" title="select_type 优化用不到"></a>select_type 优化用不到</h3><p>常用的：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">SIMPLE</td>
+<td align="center">简单SELECT查询，不包含子查询和UNION</td>
+</tr>
+<tr>
+<td align="left">PRIMARY</td>
+<td align="center">复杂查询中的最外层查询，表示主要的查询</td>
+</tr>
+<tr>
+<td align="left">SUBQUERY</td>
+<td align="center">SELECT或WHERE列表中包含了子查询</td>
+</tr>
+<tr>
+<td align="left">DERIVED</td>
+<td align="center">FROM列表中包含的子查询，即衍生</td>
+</tr>
+<tr>
+<td align="left">UNION</td>
+<td align="center">UNION关键字之后的查询</td>
+</tr>
+<tr>
+<td align="left">UNION RESULT</td>
+<td align="center">从UNION后的表获取结果集</td>
+</tr>
+</tbody></table>
+<p><strong>simple</strong>：简单查询。查询不包含子查询和union</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> film <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>Primary</strong>：查询中若包含任何复杂的子部分，最外层查询则被标记为Primary</p>
+<p><strong>DERIVED</strong>：在FROM列表中包含的子查询被标记为DERIVED(衍生)，MySQL会递归执行这些子查询,把结果放在临时表里。相当于是临时表</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165315124.png" alt="image-20211204165315124"></p>
+<p><strong>SUBQUERY</strong>： 在SELECT或WHERE列表中包含了子查询</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165442525.png" alt="image-20211204165442525"></p>
+<p><strong>DEPENDENT SUBQUERY</strong>：在 SELECT或WHERE列表中包含了子查询,子查询基于外层</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165518891.png" alt="image-20211204165518891"></p>
+<p><strong>UNCACHEABLE SUBQUREY</strong>：</p>
+<p><strong>UNION</strong>：若第二个SELECT出现在UNION之后，则被标记为UNION;若UNION包含在FROM子句的子查询中,外层SELECT将被标记为: DERIVED</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165816246.png" alt="image-20211204165816246"></p>
+<p><strong>UNION RESULT</strong>：从UNION 表获取结果的SELECT</p>
+<h3 id="table-优化用不到"><a href="#table-优化用不到" class="headerlink" title="table 优化用不到"></a>table 优化用不到</h3><p>该列的值表示输出行所引用的表的名称，比如前面的：t1、t2等表名。</p>
+<p>但也可以是以下值之一：</p>
+<ul>
+<li><code>&lt;unionM,N&gt;</code>：具有和id值的行的M并集N。</li>
+<li><code>&lt;derivedN&gt;</code>：用于与该行的派生表结果id的值N。派生表可能来自（例如）FROM子句中的子查询 。</li>
+<li><code>&lt;subqueryN&gt;</code>：子查询的结果，其id值为N</li>
+</ul>
+<h3 id="type（连接类型）-重点"><a href="#type（连接类型）-重点" class="headerlink" title="type（连接类型） 重点"></a>type（连接类型） 重点</h3><p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220104192326359" alt="图片"></p>
+<p>显示查询使用了何种类型，执行结果从最好到最坏的的顺序是从上到下。</p>
+<p>我们需要重点掌握的是下面几种类型：</p>
+<p>system（表里只有一行数据）&gt;const（where id&#x3D;1。能够通过索引直接找到）&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</p>
+<h4 id="ALL：即全表扫描，"><a href="#ALL：即全表扫描，" class="headerlink" title="ALL：即全表扫描，"></a><strong>ALL</strong>：即全表扫描，</h4><p>意味着mysql需要从头到尾去查找所需要的行。通常情况下这需要增加索引来进行优化了</p>
+<h4 id="index：全索引扫描"><a href="#index：全索引扫描" class="headerlink" title="index：全索引扫描"></a><strong>index</strong>：全索引扫描</h4><p>和ALL一样，不同就是mysql只需扫描索引树，这通常比ALL快一些。出现index是 sql 使用了索引但是没用通过索引进行过滤，一般是使用了覆盖索引或者是利用索引进行了排序分组。</p>
+<p>过滤条件没有用上索引，from和where之间用了索引，但是where之后没有用上索引</p>
+<h4 id="range：利用索引的范围查询"><a href="#range：利用索引的范围查询" class="headerlink" title="range：利用索引的范围查询"></a><strong>range</strong>：利用索引的范围查询</h4><p>范围扫描通常出现在 in(), between ,&gt; ,&lt;, &gt;&#x3D; 等操作中。使用一个索引来检索给定范围的行。</p>
+<h4 id="index-subquery："><a href="#index-subquery：" class="headerlink" title="index. subquery："></a><strong>index. subquery</strong>：</h4><p>利用索引来关联子查询，不再全表扫描。就是<strong>子查询使用了索引</strong></p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204171055075.png" alt="image-20211204171055075"></p>
+<h4 id="index-merge"><a href="#index-merge" class="headerlink" title="index_merge"></a>index_merge</h4><p><img src="file:///Users/helloworld/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/Markdown/%E5%90%8E%E5%8F%B0/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96.assets/image-20211204170921565.png?lastModify=1641295756" alt="image-20211204170921565"></p>
+<h4 id="ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引"><a href="#ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引" class="headerlink" title="ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引"></a><strong>ref</strong>：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引</h4><p>非唯一性索引扫描，返回匹配某个单独值的所有行，本质上也是一种索引访问，它返回所有匹配某个单独值的行，然而，它可能会找到多个符合条件的行，所以他应该属于查找和扫描的混合体</p>
+<p>唯一索引：对于同一个key，只返回一条数据</p>
+<p>非唯一索引：对于同一个key，返回多条数据</p>
+<h4 id="eq-ref：联合查询，被驱动表使用唯一索引"><a href="#eq-ref：联合查询，被驱动表使用唯一索引" class="headerlink" title="eq_ref：联合查询，被驱动表使用唯一索引"></a><strong>eq_ref</strong>：联合查询，被驱动表使用唯一索引</h4><p>primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种 type。</p>
+<p>唯一性索引扫描，对于每个索引键，表中只有一-条记录与之匹配。</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204170556724.png" alt="image-20211204170556724"></p>
+<h4 id="const：单表，唯一索引"><a href="#const：单表，唯一索引" class="headerlink" title="const：单表，唯一索引"></a>const：单表，唯一索引</h4><p>通过一次索引就能找到数据，一般用于主键或唯一索引作为条件的查询sql中，</p>
+<h3 id="possible-keys（可能的索引选择）"><a href="#possible-keys（可能的索引选择）" class="headerlink" title="possible_keys（可能的索引选择）"></a>possible_keys（可能的索引选择）</h3><h3 id="key（实际用到的索引-重点"><a href="#key（实际用到的索引-重点" class="headerlink" title="key（实际用到的索引)重点"></a>key（实际用到的索引)重点</h3><p>实际使用的索引。如果为NULL，则没有使用索引</p>
+<p>查询中若使用了覆盖索引，则该索引和查询的select字段重叠</p>
+<p><strong>key这一列的作用：看sql语句有没有使用索引。</strong></p>
+<h3 id="key-len（实际索引的长度）重点"><a href="#key-len（实际索引的长度）重点" class="headerlink" title="key_len（实际索引的长度）重点"></a>key_len（实际索引的长度）重点</h3><p><strong>key_len这一列的作用：看sql语句有没有&#x3D;&#x3D;充分&#x3D;&#x3D;使用索引。</strong></p>
+<p>where后面筛选条件命中索引的长度。</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204172223871.png" alt="image-20211204172223871"></p>
+<p>数值越大越好</p>
+<p>key_len&#x3D;age的字节长度+name的字节长度&#x3D;4+1 + ( 20*3+2)&#x3D;5+62&#x3D;67</p>
+<p><strong>决定key_len值的三个因素</strong>：</p>
+<p> 1.字符集</p>
+<p> 2.长度</p>
+<p> 3.是否为空 </p>
+<p>常用的字符编码占用字节数量如下：</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220104193743242" alt="图片"></p>
+<p>mysql常用字段占用字节数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">字段类型</th>
+<th align="center">占用字节数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">char(n)</td>
+<td align="center">n</td>
+</tr>
+<tr>
+<td align="left">varchar(n)</td>
+<td align="center">n + 2</td>
+</tr>
+<tr>
+<td align="left">tinyint</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="left">smallint</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="left">int</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="left">bigint</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="left">date</td>
+<td align="center">3</td>
+</tr>
+<tr>
+<td align="left">timestamp</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="left">datetime</td>
+<td align="center">8</td>
+</tr>
+</tbody></table>
+<p>此外，如果字段类型允许为空则加1个字节。</p>
+<h3 id="ref（与索引比较的列）"><a href="#ref（与索引比较的列）" class="headerlink" title="ref（与索引比较的列）"></a>ref（与索引比较的列）</h3><h3 id="rows（预计要检查的行数）"><a href="#rows（预计要检查的行数）" class="headerlink" title="rows（预计要检查的行数）"></a>rows（预计要检查的行数）</h3><p>物理扫描的行数，数值越少越好</p>
+<p>但这是估计的，最终扫描的行数在这个数值左右</p>
+<h3 id="Extra（附加信息）重点"><a href="#Extra（附加信息）重点" class="headerlink" title="Extra（附加信息）重点"></a>Extra（附加信息）重点</h3><p>与 order by，group by有关</p>
+<p>重点优化：</p>
+<h4 id="Using-temporary："><a href="#Using-temporary：" class="headerlink" title="Using temporary："></a><strong>Using temporary</strong>：</h4><p>group by没用上索引，使用了临时表。（group by 包含order by）</p>
+<h4 id="Using-filesort："><a href="#Using-filesort：" class="headerlink" title="Using filesort："></a><strong>Using filesort</strong>：</h4><p>order by没有用上索引</p>
+<h4 id="Using-join-buffer："><a href="#Using-join-buffer：" class="headerlink" title="Using join buffer："></a><strong>Using join buffer</strong>：</h4><p>关联字段没用上索引</p>
+<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204172958893.png" alt="image-20211204172958893"></p>
+<p>USING index</p>
+<p>Using where</p>
+<p>impossible where</p>
+<p>select tables optimized away</p>
+<h1 id="优化点"><a href="#优化点" class="headerlink" title="优化点"></a>优化点</h1><p>优化主要与索引、事务有关</p>
+<h2 id="批量插入数据"><a href="#批量插入数据" class="headerlink" title="批量插入数据"></a>批量插入数据</h2><ol>
+<li>关闭事务自动提交</li>
+<li>删除索引</li>
+<li>mybatis框架的优化</li>
+</ol>
+<h2 id="对于索引的优化"><a href="#对于索引的优化" class="headerlink" title="对于索引的优化"></a>对于索引的优化</h2><p>主要看 explain的 type、extra两个字段</p>
+<p>重点关注：</p>
+<ul>
+<li><p>key（查看有没有使用索引）</p>
+</li>
+<li><p>key_len（查看索引使用是否充分）</p>
+</li>
+<li><p>type（查看索引类型）</p>
+</li>
+<li><p>Extra（查看附加信息：排序、临时表、where条件为false等）</p>
+<p>一般情况下根据这4列就能找到索引问题。</p>
+</li>
+</ul>
+<h2 id="关联查询的优化"><a href="#关联查询的优化" class="headerlink" title="关联查询的优化"></a>关联查询的优化</h2><ol>
+<li>保证被驱动表的 join实段已经被索引</li>
+<li>left join时， 选择小表作为驱动表，大表作为被驱动表。</li>
+<li>inner join时，mysql会自己帮你把小结果集的表选为驱动表。</li>
+<li>子查询尽量不要放在被驱动表，有可能使用不到索引。因为需要子查询结果作为虚拟表 virtual，虚拟表无法建立索引</li>
+<li>能够直接多表关联的尽量直接关联，不用子查询。</li>
+</ol>
+<h2 id="驱动表的选取"><a href="#驱动表的选取" class="headerlink" title="驱动表的选取"></a>驱动表的选取</h2><h3 id="什么是驱动表"><a href="#什么是驱动表" class="headerlink" title="什么是驱动表"></a>什么是驱动表</h3><ol>
+<li>当连接查询没有where条件时，左连接查询时，前面的表是驱动表，后面的表是被驱动表，右连接查询时相反，内连接查询时，哪张表的数据较少，哪张表就是驱动表</li>
+<li>当连接查询有where条件时，带where条件的表是驱动表，否则是被驱动表</li>
+</ol>
+<h3 id="为什么用小表驱动大表"><a href="#为什么用小表驱动大表" class="headerlink" title="为什么用小表驱动大表"></a>为什么用小表驱动大表</h3><p>关联查询类似如下的结构</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (row1 : 驱动表) &#123; <span class="comment">// 行数为 x</span></span><br><span class="line">    <span class="keyword">for</span> (row2 : 被驱动表)&#123;</span><br><span class="line">        <span class="keyword">if</span> (conidtion == <span class="literal">true</span>)&#123; <span class="comment">// 行数为 y</span></span><br><span class="line">            send client</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>时间复杂度为：（因为被驱动表用了索引）</p>
+<blockquote>
+<p>x*log(y)</p>
+</blockquote>
+<p>由上公式可知，x必定为小表</p>
+<h2 id="子查询的优化"><a href="#子查询的优化" class="headerlink" title="子查询的优化"></a>子查询的优化</h2><p>尽量不要使用not in 或者 not exists，使用left outer join on xxx is null替代</p>
+<h2 id="order-by优化"><a href="#order-by优化" class="headerlink" title="order by优化"></a>order by优化</h2><p>order by：必须要有过滤条件，才能用上索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 用不上索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> SQL_NO_CACHE <span class="operator">*</span> <span class="keyword">FROM</span> emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> age,deptid;</span><br><span class="line"></span><br><span class="line"># 用得上索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> SQL_NO_CACHE <span class="operator">*</span> <span class="keyword">FROM</span> emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> age, deptid LIMIT <span class="number">10</span>; # 使用limit也能用索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="keyword">FROM</span> emp <span class="keyword">WHERE</span> age<span class="operator">=</span><span class="number">45</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptid;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>顺序错，必排序</p>
+<p>方向反，必排序</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV12b411K7Zu?p=339">https://www.bilibili.com/video/BV12b411K7Zu?p=339</a></p>
+<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><h1 id="优化技巧"><a href="#优化技巧" class="headerlink" title="优化技巧"></a>优化技巧</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Vv6IB9toAJ2AThdJxIOgqA">聊聊sql优化的15个小技巧 (qq.com)</a></p>
+<p>sql语句在做一些耗时的操作之前，应尽可能缩小数据范围，这样能提升sql整体的性能。</p>
+<ol>
+<li>避免使用select *</li>
+<li>用union all代替union</li>
+<li>小表驱动大表</li>
+<li>批量操作</li>
+<li>多用limit</li>
+<li>in中值太多</li>
+<li>增量查询</li>
+<li>高效的分页（逻辑分页）</li>
+<li>用连接查询代替子查询</li>
+<li>join的表不宜过多，阿里巴巴开发者手册的规定，join表的数量不应该超过<code>3</code>个。</li>
+<li>join时要注意（与inner、left join有关）</li>
+<li>控制索引的数量</li>
+<li>选择合理的字段类型</li>
+<li>提升group by的效率</li>
+<li>索引优化</li>
+</ol>
+<h2 id="1-避免使用select"><a href="#1-避免使用select" class="headerlink" title="1. 避免使用select *"></a>1. 避免使用select *</h2><p>在实际业务场景中，可能我们真正需要使用的只有其中一两列。查了很多数据，但是不用，白白浪费了数据库资源，比如：内存或者cpu。</p>
+<p>此外，多查出来的数据，通过网络IO传输的过程中，也会增加数据传输的时间。</p>
+<p>还有一个最重要的问题是：<code>select *</code>不会走<code>覆盖索引</code>，会出现大量的<code>回表</code>操作，而从导致查询sql的性能很低。</p>
+<h2 id="2-用union-all代替union"><a href="#2-用union-all代替union" class="headerlink" title="2. 用union all代替union"></a>2. 用union all代替union</h2><p>我们都知道sql语句使用<code>union</code>关键字后，可以获取排重后的数据。</p>
+<p>而如果使用<code>union all</code>关键字，可以获取所有数据，包含重复的数据。</p>
+<p><strong>排重的过程需要遍历、排序和比较，它更耗时，更消耗cpu资源</strong>。</p>
+<p>所以如果能用union all的时候，尽量不用union。</p>
+<h2 id="4-批量操作"><a href="#4-批量操作" class="headerlink" title="4. 批量操作"></a>4. 批量操作</h2><p>每次远程请求数据库，是会消耗一定性能的。</p>
+<p>但需要注意的是，不建议一次批量操作太多的数据，如果数据太多数据库响应也会很慢。批量操作需要把握一个度，建议每批数据尽量控制在500以内。如果数据多于500，则分多批次处理。</p>
+<h2 id="5-多用limit"><a href="#5-多用limit" class="headerlink" title="5. 多用limit"></a>5. 多用limit</h2><p>有时候，我们需要查询某些数据中的第一条，比如：查询某个用户下的第一个订单，想看看他第一次的首单时间。</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这种做法在功能上没有问题，但它的效率非常不高，需要先查询出所有的数据，有点浪费资源。</p>
+<p><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span> </span><br><span class="line">limit <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="8-高效的分页（逻辑分页）"><a href="#8-高效的分页（逻辑分页）" class="headerlink" title="8. 高效的分页（逻辑分页）"></a>8. 高效的分页（逻辑分页）</h2><p>反例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> limit <span class="number">1000000</span>,<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>mysql会查到1000020条数据，然后丢弃前面的1000000条，只查后面的20条数据，这个是非常浪费资源的。</p>
+<p>那么，这种海量数据该怎么分页呢？</p>
+<p>优化sql：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="operator">&gt;</span> <span class="number">1000000</span> limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>先找到上次分页最大的id，然后利用id上的索引查询。不过该方案，要求id是连续的，并且有序的。</p>
+<p>还能使用<code>between</code>优化分页。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="keyword">between</span> <span class="number">1000000</span> <span class="keyword">and</span> <span class="number">1000020</span>;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是between要在唯一索引上分页，不然会出现每页大小不一致的问题。</p>
+<h2 id="9-用连接查询代替子查询"><a href="#9-用连接查询代替子查询" class="headerlink" title="9. 用连接查询代替子查询"></a>9. 用连接查询代替子查询</h2><p>mysql中如果需要从两张以上的表中查询出数据的话，一般有两种实现方式：<code>子查询</code> 和 <code>连接查询</code>。</p>
+<p>子查询的例子如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="keyword">in</span> (<span class="keyword">select</span> id <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> status<span class="operator">=</span><span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>子查询语句可以通过<code>in</code>关键字实现，一个查询语句的条件落在另一个select语句的查询结果中。程序先运行在嵌套在最内层的语句，再运行外层的语句。</p>
+<p>子查询语句的优点是简单，结构化，如果涉及的表数量不多的话。</p>
+<p>但缺点是<strong>mysql执行子查询时，需要创建临时表，查询完毕后，需要再删除这些临时表，有一些额外的性能消耗。</strong></p>
+<p>这时可以改成连接查询。具体例子如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.<span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span> o</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="11-join时小表驱动大表"><a href="#11-join时小表驱动大表" class="headerlink" title="11.  join时小表驱动大表"></a>11.  join时小表驱动大表</h2><p>如果两张表使用inner join关联，mysql会自动选择两张表中的小表，去驱动大表，所以性能上不会有太大的问题。</p>
+<p>使用left join的示例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.id,o.code,u.name </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">order</span> o </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果两张表使用left join关联，mysql会默认用left join关键字左边的表，去驱动它右边的表。如果左边的表数据很多时，就会出现性能问题。</p>
+<blockquote>
+<p>要特别注意的是在用left join关联查询时，左边要用小表，右边可以用大表。如果能用inner join的地方，尽量少用left join。</p>
+</blockquote>
+<h2 id="12-控制索引的数量"><a href="#12-控制索引的数量" class="headerlink" title="12. 控制索引的数量"></a>12. 控制索引的数量</h2><p>mysql使用的B+树的结构来保存索引的，在insert、update和delete操作时，需要更新B+树索引。如果索引过多，会消耗很多额外的性能。</p>
+<p>阿里巴巴的开发者手册中规定，单表的索引数量应该尽量控制在<code>5</code>个以内，并且单个索引中的字段数不超过<code>5</code>个。</p>
+<p>那么，问题来了，如果表中的索引太多，超过了5个该怎么办？</p>
+<p>这个问题要辩证的看，如果你的系统并发量不高，表中的数据量也不多，其实超过5个也可以，只要不要超过太多就行。</p>
+<p>但对于一些高并发的系统，请务必遵守单表索引数量不要超过5的限制。</p>
+<p>那么，高并发系统如何优化索引数量？</p>
+<p><strong>能够建联合索引，就别建单个索引，可以删除无用的单个索引。</strong></p>
+<p>将部分查询功能迁移到其他类型的数据库中，比如：Elastic Seach、HBase等，在业务表中只需要建几个关键索引即可。</p>
+<h2 id="13-选择合理的字段类型"><a href="#13-选择合理的字段类型" class="headerlink" title="13. 选择合理的字段类型"></a>13. 选择合理的字段类型</h2><p>我们在选择字段类型时，应该遵循这样的原则：</p>
+<ol>
+<li>能用数字类型，就不用字符串，因为字符的处理往往比数字要慢。</li>
+<li>尽可能使用小的类型，比如：用bit存布尔值，用tinyint存枚举值等。</li>
+<li>长度固定的字符串字段，用char类型。</li>
+<li>长度可变的字符串字段，用varchar类型。</li>
+<li>金额字段用decimal，避免精度丢失问题。</li>
+</ol>
+<h2 id="14-提升group-by的效率"><a href="#14-提升group-by的效率" class="headerlink" title="14. 提升group by的效率"></a>14. 提升group by的效率</h2><p>我们有很多业务场景需要使用<code>group by</code>关键字，它主要的功能是去重和分组。</p>
+<p>通常它会跟<code>having</code>一起配合使用，表示分组后再根据一定的条件过滤数据。</p>
+<p><strong>反例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id111</span><br><span class="line"><span class="keyword">having</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法性能不好，它先把所有的订单根据用户id分组之后，再去过滤用户id大于等于200的用户。</p>
+<p>分组是一个相对耗时的操作，为什么我们不先缩小数据的范围之后，再分组呢？</p>
+<p><strong>正例：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id</span><br></pre></td></tr></table></figure>
+
+<p>使用where条件在分组前，就把多余的数据过滤掉了，这样分组时效率就会更高一些。</p>
+<blockquote>
+<p>其实这是一种思路，不仅限于group by的优化。我们的sql语句在做一些耗时的操作之前，应尽可能缩小数据范围，这样能提升sql整体的性能。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" data-id="cliribsxf000fhlszeuvchal2" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-JavaInterview/数据库/MVCC" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.482Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://www.php.cn/mysql-tutorials-460111.html">全网最全的一篇数据库MVCC详解，不全我负责-mysql教程-PHP中文网</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jmliao/p/13204946.html">MVCC ReadView介绍 - IUNI_JM - 博客园 (cnblogs.com)</a></p>
+<p>所谓的MVCC指的就是在使用READ COMMITTD、REPEATABLE READ这两种隔离级别的事务在执行普通的SEELCT操作时访问记录的<strong>版本链</strong>的过程，这样子可以使不同事务的读-写、写-读操作并发执行，从而提升系统性能。</p>
+<h1 id="MVCC概念"><a href="#MVCC概念" class="headerlink" title="MVCC概念"></a>MVCC概念</h1><p>全称Multi-Version Concurrency Control，即<strong>多版本并发控制</strong>，是“维持一个数据的多个版本，使<strong>读写操作没有冲突</strong>”的一个抽象概念，快照读是其具体实现。主要是为了提高数据库的并发性能。</p>
+<ul>
+<li>MVCC与悲观和乐观并发控制并不是对立的，很直观的一点MVCC可以在不加锁的情况下解决读-写冲突，并不能解决写-写冲突，写操作还是需要上锁</li>
+<li>MVCC可以与悲观并发或乐观并发结合使用来提高并发的性能</li>
+</ul>
+<p>以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。</p>
+<p>同一行数据平时发生读写请求时，会上锁阻塞住。但mvcc用<strong>快照读</strong>更好的方式去处理读—写请求，做到在<strong>发生读—写请求冲突时不用加锁。</strong>这个读是指的<strong>快照读</strong>（<strong>快照读</strong>就是读<strong>数据行的以前版本</strong>），而不是<strong>当前读</strong>，当前读是一种加锁操作，是悲观锁。</p>
+<p>mvcc用来解决读—写冲突的无锁并发控制，就是为事务分配单向增长的时间戳。为每个数据修改保存一个版本，版本与事务时间戳相关联。</p>
+<p>读操作只读取该事务开始前的数据库快照。</p>
+<h2 id="MVCC了解决了："><a href="#MVCC了解决了：" class="headerlink" title="MVCC了解决了："></a>MVCC了解决了：</h2><ul>
+<li>并发读-写时：可以做到读操作不阻塞写操作，同时写操作也不会阻塞读操作。</li>
+<li>解决脏读、幻读、不可重复读等事务隔离问题，但不能解决 写-写 更新丢失问题（现实中应该不存在 写-写问题，因为会上写锁）。</li>
+</ul>
+<p>因此有了下面提高并发性能的组合拳：</p>
+<ul>
+<li><p>MVCC + 悲观锁（写锁）：MVCC解决读写冲突，悲观锁解决写写冲突</p>
+</li>
+<li><p>MVCC + 乐观锁：MVCC解决读写冲突，乐观锁解决读写冲突</p>
+</li>
+</ul>
+<h2 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h2><p>它读取的数据库记录，都是当前最新的版本，会对当前读取的数据进行加锁，防止其他事务修改数据。是悲观锁的一种操作。</p>
+<p>如下操作都是当前读：</p>
+<ul>
+<li>select lock in share mode (共享锁)</li>
+<li>select for update (排他锁)</li>
+<li>update (排他锁)</li>
+<li>insert (排他锁)</li>
+<li>delete (排他锁)</li>
+<li>串行化事务隔离级别</li>
+</ul>
+<h2 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h2><p>快照读的实现是基于多版本并发控制，即MVCC，既然是多版本，那么快照读读到的数据不一定是当前最新的数据，有可能是之前历史版本的数据。</p>
+<p>如下操作是快照读：</p>
+<ul>
+<li>不加锁的select操作（注：事务级别不是串行化）</li>
+</ul>
+<p>MySQL对<code>insert</code>、<code>update</code>和<code>delete</code>语句所使用的<strong>当前读</strong>（current read）。因为涉及到数据的修改，所以MySQL必须拿到最新的数据才能修改，所以涉及到数据的修改肯定不能使用<strong>快照读</strong>（snapshot read）。</p>
+<h1 id="MVCC的实现原理"><a href="#MVCC的实现原理" class="headerlink" title="MVCC的实现原理"></a>MVCC的实现原理</h1><p>它的实现原理主要是<strong>版本链</strong>，<strong>undo日志</strong> ，<strong>Read View</strong> 来实现的</p>
+<h2 id="版本链"><a href="#版本链" class="headerlink" title="版本链"></a>版本链</h2><p>我们数据库中的每行数据，除了我们肉眼看见的数据，还有几个隐藏字段，得开天眼才能看到。分别是db_trx_id、db_roll_pointer、db_row_id。</p>
+<ul>
+<li><p>db_trx_id：6byte，最近修改(修改&#x2F;插入)事务ID：记录创建这条记录&#x2F;最后一次修改该记录的事务ID。</p>
+</li>
+<li><p>db_roll_pointer（版本链关键）：7byte，回滚指针，指向这条记录的上一个版本（存储于rollback segment里）</p>
+</li>
+<li><p>db_row_id：6byte，隐含的自增ID（隐藏主键），如果数据表没有主键，InnoDB会自动以db_row_id产生一个聚簇索引。</p>
+</li>
+<li><p>delete_flag：（就跟计组Cache中的标记位一样）实际还有一个删除flag隐藏字段, 记录被更新或删除并不代表真的删除，而是删除flag变了</p>
+</li>
+</ul>
+<p><img src="/MVCC.assets/7d239fc720ed0f548d4d994272398847-2.png" alt="img"></p>
+<p>如上图，db_row_id是数据库默认为该行记录生成的唯一隐式主键，db_trx_id是当前操作该记录的事务ID，而db_roll_pointer是一个回滚指针，用于配合undo日志，指向上一个旧版本。</p>
+<p>每次对数据库记录进行改动，都会记录一条undo日志，每条undo日志也都有一个roll_pointer属性（INSERT操作对应的undo日志没有该属性，因为该记录并没有更早的版本），可以将这些undo日志都连起来，串成一个链表，所以现在的情况就像下图一样：</p>
+<p><img src="/MVCC.assets/7d239fc720ed0f548d4d994272398847-3.png" alt="img"></p>
+<h2 id="undo日志"><a href="#undo日志" class="headerlink" title="undo日志"></a>undo日志</h2><p>Undo log 主要用于记录数据被修改之前的日志，在表信息修改之前先会把数据拷贝到undo log里。</p>
+<p>当事务进行回滚时可以通过undo log 里的日志进行数据还原。</p>
+<h1 id="Read-View-读-操作的-视图"><a href="#Read-View-读-操作的-视图" class="headerlink" title="Read View 读(操作的)视图"></a>Read View 读(操作的)视图</h1><p>事务进行<strong>快照读</strong>操作的时候生产的**读视图(Read View)**，在该事务执行的快照读的那一刻，会生成数据库系统当前的一个快照。</p>
+<p>记录并维护<strong>系统当前活跃事务的ID</strong>(没有commit的事务ID。当每个事务开启时，都会被分配一个ID, 这个ID是递增的，所以越新的事务，ID值越大)列表 list，该list 是系统中当前不应该被本事务看到的其他事务id列表。</p>
+<p>Read View主要是用来做可见性判断的：</p>
+<ol>
+<li>即当我们某个事务执行快照读的时候，对该记录创建一个Read View读视图，</li>
+<li>并将 trx_id（表中每个 roll中存储的 db_trx_id，即最后一次修改该 roll的事务id） 当做作条件，来判断当前事务能够看到哪个版本的数据，既可能是当前最新的数据，也有可能是该行记录的undo log里面的某个版本的数据。</li>
+</ol>
+<h2 id="Read-View几个属性"><a href="#Read-View几个属性" class="headerlink" title="Read View几个属性"></a>Read View几个属性</h2><table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">当前系统中那些活跃(未提交)的读写事务ID, 它数据结构为一个List。</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">表示生成Read View时，系统中应该分配给下一个事务的id值。</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">表示在生成Read View时，当前系统中活跃的读写事务中最小的事务id，即m_ids中的最小值。</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">创建当前Read View的事务ID</td>
+</tr>
+</tbody></table>
+<p>判断是否可以直接读，如果不能<code>直接读</code>，则需要去 undo log中<code>快照读</code></p>
+<ul>
+<li><code>trx_id</code> &#x3D;&#x3D; <code>creator_trx_id</code>，则<strong>可以访问</strong>：如果被访问版本的<code>trx_id</code>属性值与<code>ReadView</code>中的<code>creator_trx_id</code>值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问。</li>
+<li><code>trx_id</code>  &lt;<code>min_trx_id</code>，则<strong>可以访问</strong>：如果被访问版本的<code>trx_id</code>属性值小于<code>ReadView</code>中的<code>min_trx_id</code>值，表明生成该版本的事务在当前事务生成<code>ReadView</code>前已经提交，所以该版本可以被当前事务访问。</li>
+<li><code>max_trx_id</code> &lt;&#x3D; <code>trx_id</code> ，则<strong>不可以访问</strong>： 如果被访问版本的<code>trx_id</code>属性值大于或等于<code>ReadView</code>中的<code>max_trx_id</code>值，表明生成该版本的事务在当前事务生成<code>ReadView</code>后才开启，所以该版本不可以被当前事务访问。</li>
+<li><code>min_trx_id</code>&lt;&#x3D; <code>trx_id</code> &lt; <code>max_trx_id</code>，则需分析<code>trx_id∈m_ids</code> 和 <code>trx_id∉m_ids</code>： 如果被访问版本的<code>trx_id</code>属性值在<code>ReadView</code>的<code>min_trx_id</code>和<code>max_trx_id</code>之间，那就需要判断一下<code>trx_id</code>属性值是不是在<code>m_ids</code>列表中，如果在，说明创建<code>ReadView</code>时生成该版本的事务还是活跃的，该版本<strong>不可以访问</strong>；如果不在，说明创建<code>ReadView</code>时生成该版本的事务已经被提交，该版本<strong>可以访问</strong>。</li>
+</ul>
+<p>注：以上 trx_id是当前被访问的行的 db_trx_id</p>
+<h1 id="根据-Read-View实现隔离级别"><a href="#根据-Read-View实现隔离级别" class="headerlink" title="根据 Read View实现隔离级别"></a>根据 Read View实现隔离级别</h1><h2 id="读已提交-和-可重复度"><a href="#读已提交-和-可重复度" class="headerlink" title="读已提交 和 可重复度"></a>读已提交 和 可重复度</h2><p>上面所讲的Read View用于支持RC（Read Committed，读提交）和RR（Repeatable Read，可重复读）隔离级别的实现。RR、RC生成时机</p>
+<ul>
+<li>RC隔离级别下，是每个快照读都会生成并获取最新的Read View；</li>
+<li>而在RR隔离级别下，则是<strong>同一个事务中的第一个快照读</strong>才会创建Read View, 之后的快照读获取的都是同一个Read View，之后的查询就不会重复生成了，所以一个事务的查询结果每次都是一样的。</li>
+</ul>
+<h2 id="可重复读"><a href="#可重复读" class="headerlink" title="可重复读"></a>可重复读</h2><ol>
+<li>获取事务自己的版本号，即事务ID</li>
+<li>获取Read View</li>
+<li>查询得到的数据，然后Read View中的事务版本号进行比较。</li>
+<li>如果不符合Read View的可见性规则， 即就需要Undo log中历史快照;</li>
+<li>最后返回符合规则的数据</li>
+</ol>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p><img src="/MVCC.assets/640" alt="图片"></p>
+<p>在可重复读（RR）隔离级别下，一个事务里只会获取一次<code>read view</code>，都是副本共用的，从而保证每次查询的数据都是一样的。</p>
+<p>假设当前有一张core_user表，插入一条初始化数据,如下：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1PmpzLBV5zbOkvrsTxZqbOic8vmIxzgrAY6ftdVpq4b41ZR3SU6IHOH9JIQ7AaDIJQY1GjQ5b7Rq11BQw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>基于MVCC，我们来看看执行流程</p>
+<ol>
+<li>A开启事务，首先得到一个事务ID为100</li>
+<li>B开启事务，得到事务ID为101</li>
+<li>事务A生成一个Read View，read view对应的值如下</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">100，101</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">102</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">100</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">100</td>
+</tr>
+</tbody></table>
+<p>然后回到版本链：开始从版本链中挑选可见的记录：</p>
+<p><img src="/MVCC.assets/640" alt="图片"></p>
+<p>由图可以看出，最新版本的列name的内容是孙权，该版本的trx_id值为100。开始执行<strong>read view可见性规则</strong>校验：</p>
+<blockquote>
+<p>min_limit_id(100) &lt;&#x3D; trx_id（100）&lt;102;<br>creator_trx_id &#x3D; trx_id &#x3D;100;</p>
+</blockquote>
+<p>由此可得，trx_id&#x3D;100的这个记录，当前事务是可见的。所以查到是<strong>name为孙权</strong>的记录。</p>
+<ol start="4">
+<li>事务B进行修改操作，把名字改为曹操。把原数据拷贝到undo log,然后对数据进行修改，标记事务ID和上一个数据版本在undo log的地址。</li>
+</ol>
+<p><img src="/MVCC.assets/640" alt="图片"></p>
+<ol start="5">
+<li>事务B提交事务</li>
+<li>事务A再次执行查询操作，因为是RR（可重复读）隔离级别，因此会复用老的Read View副本，Read View对应的值如下</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">100，101</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">102</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">100</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">100</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" data-id="cliribsx70003hlsz3yps0wvq" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

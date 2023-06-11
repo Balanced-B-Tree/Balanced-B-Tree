@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="[toc] MySQL存储引擎MyISAM和InnoDB底层索引结构_@子敬的博客-CSDN博客_myisam索引结构 不要过度建索引，只保持所需的索引。每个额外的索引都要占用额外的磁盘空间，并降低写操作的 性能。 在修改表的内容时，索引必须进行更新，有时可能需要重构，因此，索引越多，所花的时间越长。 MySQL 只对一下操作符才使用索引： &lt;,&lt;&#x3D;,&#x3D;,&gt;,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="[toc] MySQL存储引擎MyISAM和InnoDB底层索引结构_@子敬的博客-CSDN博客_myisam索引结构 不要过度建索引，只保持所需的索引。每个额外的索引都要占用额外的磁盘空间，并降低写操作的 性能。 在修改表的内容时，索引必须进行更新，有时可能需要重构，因此，索引越多，所花的时间越长。 MySQL 只对一下操作符才使用索引： &lt;,&lt;&#x3D;,&#x3D;,&gt;,">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%B4%A2%E5%BC%95.assets/image-20210730210627956.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%B4%A2%E5%BC%95.assets/image-20210730210700213.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%B4%A2%E5%BC%95.assets/image-20210730212324231.png">
+<meta property="article:published_time" content="2023-06-11T10:43:17.583Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.583Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/%E7%B4%A2%E5%BC%95.assets/image-20210730210627956.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/索引" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.583Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u010922732/article/details/82994253?utm_source=app&app_version=4.15.2">MySQL存储引擎MyISAM和InnoDB底层索引结构_@子敬的博客-CSDN博客_myisam索引结构</a></p>
+<p>不要过度建索引，只保持所需的索引。每个额外的索引都要占用额外的磁盘空间，并降低写操作的 性能。 在修改表的内容时，索引必须进行更新，有时可能需要重构，因此，索引越多，所花的时间越长。</p>
+<p>MySQL 只对一下操作符才使用索引： &lt;,&lt;&#x3D;,&#x3D;,&gt;,&gt;&#x3D;,between,in 以及某些时候的 like(不以通配符%或_开头的情形)。</p>
+<h1 id="聚簇、非聚簇索引"><a href="#聚簇、非聚簇索引" class="headerlink" title="聚簇、非聚簇索引"></a>聚簇、非聚簇索引</h1><p>InnoDB中主键所建立的是聚簇索引，而唯一索引、普通索引、前缀索引等都是二级索引。</p>
+<p><img src="/%E7%B4%A2%E5%BC%95.assets/image-20210730210627956.png" alt="image-20210730210627956"></p>
+<p>二级索引：指的是非主键索引</p>
+<p><img src="/%E7%B4%A2%E5%BC%95.assets/image-20210730210700213.png" alt="image-20210730210700213"></p>
+<h2 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h2><p>innoDB的key值，最好用自增，可以避免数据的插入。因为在InnoDB中，数据是顺序存储的，就像数组一样，插入数据时，需要像数组一样修改文件。</p>
+<ol>
+<li>能提升IO密集型应用性能（范围查询）：因为，聚簇索引中，数据是顺序存储，能够利用局部性原理。在非聚簇索引中，数据不是顺序存储，无法使用局部性原理</li>
+<li>减少一次访盘，增加查询速度</li>
+<li>row的移动，不影响二级索引：二级索引中，叶子结点存储的是 从键-主键的映射，在根据从键找到主键后，需要拿着主键去“主键索引”中再进行一次查询。（select * 会导致 查询二级索引）</li>
+</ol>
+<h2 id="B-与B的区别"><a href="#B-与B的区别" class="headerlink" title="B+与B的区别"></a>B+与B的区别</h2><ol>
+<li>在B树中，你可以将键和值存放在内部节点和叶子节点，但在B+树中，内部节点都是键，没有值。叶子节点同时存放键和值</li>
+<li>B+树的叶子节点有一条链相连，而B+树的叶子节点各自独立。</li>
+</ol>
+<p>使用B+树的好处：</p>
+<ol>
+<li>从内存块上来说：一个内存块能存放更多的key，有利于减少磁盘与内存块的交互</li>
+<li>从范围查询上来说</li>
+</ol>
+<p>数据库的数据读取都是需要进行代价巨大的磁盘IO操作，因此，更快地缩小范围和更少的读取次数是数据库需要关注的重点。</p>
+<h1 id="索引分类"><a href="#索引分类" class="headerlink" title="索引分类"></a>索引分类</h1><p>索引我们分为四类来讲<strong>单列索引</strong>(普通索引，唯一索引，主键索引)、<strong>组合索引</strong>、<strong>全文索引</strong>、<strong>空间索引</strong>、</p>
+<ol>
+<li><p>单列索引：一个索引只包含单个列，但一个表中可以有多个单列索引。 这里不要搞混淆了。</p>
+<ol>
+<li>普通索引：MySQL中基本索引类型，没有什么限制，允许在定义索引的列中插入重复值和空值，纯粹为了查询数据更快一点。</li>
+<li>唯一索引：索引列中的值必须是唯一的，但是允许为空值，</li>
+<li>主键索引（也称聚簇索引）：是一种特殊的唯一索引，不允许有空值。（主键约束，就是一个主键索引）</li>
+</ol>
+</li>
+<li><p>组合索引：在表中的多个字段组合上创建的索引，只有在查询条件中使用了这些字段的左边字段时，索引才会被使用，使用组合索引时遵循最左前缀集合。例如，这里由id、name和age3个字段构成的索引，索引行中就按id&#x2F;name&#x2F;age的顺序存放，索引可以索引下面字段组合(id，name，age)、(id，name)或者(id)。如果要查询的字段不构成索引最左面的前缀，那么就不会是用索引，比如，age或者（name，age）组合就不会使用索引查询</p>
+</li>
+<li><p>全文索引：全文索引，只有在MyISAM引擎上才能使用，只能在CHAR,VARCHAR,TEXT类型字段上使用全文索引，介绍了要求，说说什么是全文索引，就是在一堆文字中，通过其中的某个关键字等，就能找到该字段所属的记录行，比如有”你是个大煞笔，二货 …” 通过大煞笔，可能就可以找到该条记录。这里说的是可能，因为全文索引的使用涉及了很多细节，我们只需要知道这个大概意思。</p>
+</li>
+<li><p>空间索引：空间索引是对空间数据类型的字段建立的索引，MySQL中的空间数据类型有四种，GEOMETRY、POINT、LINESTRING、POLYGON。在创建空间索引时，使用SPATIAL关键字。要求，引擎为MyISAM，创建空间索引的列，必须将其声明为NOT NULL。可能跟游戏开发有关。</p>
+</li>
+</ol>
+<h2 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h2><p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903967365791752">MySQL 覆盖索引详解 - 掘金 (juejin.cn)</a></p>
+<p>覆盖索引，即一次查找，就能找到想要的数据，无需回表。</p>
+<p>对于使用了覆盖索引的查询，在查询前面使用<code>explain</code>，输出的extra列会显示为<code>using index</code>。</p>
+<p>比如<code>user_like</code> 用户点赞表，组合索引为<code>(user_id, blog_id)</code>，<code>user_id</code>和<code>blog_id</code>都不为<code>null</code>。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> blog_id <span class="keyword">from</span> user_like <span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">13</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="回表"><a href="#回表" class="headerlink" title="回表"></a>回表</h3><p><strong>所谓回表查询</strong>，需要<strong>扫描两次索引 B+ 树</strong>，所以很显然它的性能较扫一遍索引树更低。</p>
+<p>假设表tbl有a,b,c三个字段，其中a是主键，b上建了索引，然后编写sql语句</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> tbl <span class="keyword">WHERE</span> a<span class="operator">=</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>这样不会产生回表，因为所有的数据在a的索引树中均能找到</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> tbl <span class="keyword">WHERE</span> b<span class="operator">=</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就会产生回表，因为通过 b的索引，只能找到对应的主键 a。但是，我们要找到是所有的数据 <code>a,b,c</code>，因此需要再去主键索引 a那里寻找</p>
+<h2 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h2><p>也称为组合索引，(column1, column2, column3…..)</p>
+<h2 id="前缀索引？"><a href="#前缀索引？" class="headerlink" title="前缀索引？"></a>前缀索引？</h2><p>有时需要在很长的字符列上创建索引，这会造成索引特别大且慢。使用前缀索引可以避免这个问题。</p>
+<p>前缀索引是指对文本或者字符串的前几个字符建立索引，这样索引的长度更短，查询速度更快。</p>
+<p>创建前缀索引的关键在于选择足够长的前缀以<strong>保证较高的索引选择性</strong>。索引选择性越高查询效率就越高，因为选择性高的索引可以让MySQL在查找时过滤掉更多的数据行。</p>
+<p>建立前缀索引的方式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span> email列创建前缀索引</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> table_name <span class="keyword">ADD</span> KEY(column_name(prefix_length));</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+<h1 id="建立索引的原则"><a href="#建立索引的原则" class="headerlink" title="建立索引的原则"></a>建立索引的原则</h1><ul>
+<li>索引列的<strong>区分度越高</strong>，索引的效果越好。比如使用性别这种区分度很低的列作为索引，效果就会很差。</li>
+<li>尽量使用<strong>短索引</strong>，对于较长的字符串进行索引时应该指定一个较短的前缀长度，因为较小的索引涉及到的磁盘I&#x2F;O较少，查询速度更快。</li>
+<li>索引不是越多越好，每个索引都需要额外的物理空间，维护也需要花费时间。</li>
+<li>利用<strong>最左前缀原则</strong>。</li>
+</ul>
+<p><img src="/%E7%B4%A2%E5%BC%95.assets/image-20210730212324231.png" alt="image-20210730212324231"></p>
+<h1 id="建立索引的情况"><a href="#建立索引的情况" class="headerlink" title="建立索引的情况"></a>建立索引的情况</h1><ol>
+<li><p><strong>主键</strong>：主键自动建立唯一索引P</p>
+</li>
+<li><p><strong>频繁使用的</strong>：频繁作为查询条件的字段应该创建索引</p>
+</li>
+<li><p><strong>外键</strong>：查询中与其它表关联的字段，外键关系建立索引</p>
+</li>
+<li><p><strong>组合索引</strong>：单键&#x2F;组合索引的选择问题，组合索引性价比更高</p>
+</li>
+<li><p><strong>order by</strong>：查询中排序的字段（被order by的），排序字段若通过索引去访问将大大提高排序速度</p>
+</li>
+<li><p><strong>group by</strong>：查询中统计或者分组字段（group by）</p>
+</li>
+</ol>
+<p>不用建立索引的：</p>
+<ol>
+<li>表记录太少</li>
+<li>经常增删改的表或者字段</li>
+<li>Where条件里用不到的字段不创建索引</li>
+<li>过滤性不好的不适合建索引</li>
+</ol>
+<h1 id="索引失效的情况"><a href="#索引失效的情况" class="headerlink" title="索引失效的情况"></a>索引失效的情况</h1><ol>
+<li><p>查询条件包含or，可能导致索引失效</p>
+</li>
+<li><p>如何字段类型是字符串，where时一定用引号括起来，否则索引失效</p>
+</li>
+<li><p>like通配符可能导致索引失效。</p>
+</li>
+<li><p>联合索引，查询时的条件列不是联合索引中的第一个列，索引失效。</p>
+</li>
+<li><p>在索引列上使用mysql的内置函数，索引失效。</p>
+</li>
+<li><p>对索引列运算（如，+、-、*、&#x2F;），索引失效。</p>
+</li>
+<li><p>索引字段上使用（！&#x3D; 或者 &lt; &gt;，not in）时，可能会导致索引失效。</p>
+</li>
+<li><p>索引字段上使用is null， is not null，可能导致索引失效。</p>
+</li>
+<li><p>左连接查询或者右连接查询查询关联的字段编码格式不一样，可能导致索引失效。</p>
+</li>
+<li><p>mysql估计使用全表扫描要比使用索引快,则不使用索引。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/" data-id="cliribsxe000chlsz2bcccxf5" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E8%BF%9B%E5%BA%A6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

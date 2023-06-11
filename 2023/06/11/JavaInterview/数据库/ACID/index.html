@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="[toc] 一文了解InnoDB事务实现原理 - 简书 (jianshu.com) INNODB是如何实现事务的？_argleary的博客-CSDN博客_innodb如何实现事务 事务事务不是指一次的读或者写，而是一系列的操作，必须要完整的完成的一系列操作，比如：转账  查询我的账户余额 我的账户扣款100元 100元开始转移 查询你的账户余额 你的账户到账100元  有的DBA或许会认为undo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/ACID/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="[toc] 一文了解InnoDB事务实现原理 - 简书 (jianshu.com) INNODB是如何实现事务的？_argleary的博客-CSDN博客_innodb如何实现事务 事务事务不是指一次的读或者写，而是一系列的操作，必须要完整的完成的一系列操作，比如：转账  查询我的账户余额 我的账户扣款100元 100元开始转移 查询你的账户余额 你的账户到账100元  有的DBA或许会认为undo">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/ACID.assets/803DEA44-C4F3-4379-9575-11E66F603CB4.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/ACID.assets/803DEA44-C4F3-4379-9575-11E66F603CB4.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/ACID.assets/20200425210059474.jpg">
+<meta property="og:image" content="https://balanced-b-tree.github.io/ACID.assets/20200308212726564.jpg">
+<meta property="article:published_time" content="2023-06-11T10:43:17.478Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.479Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/ACID.assets/803DEA44-C4F3-4379-9575-11E66F603CB4.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/ACID" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/ACID/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.478Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9b83ea78b380">一文了解InnoDB事务实现原理 - 简书 (jianshu.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/argleary/article/details/104189850">INNODB是如何实现事务的？_argleary的博客-CSDN博客_innodb如何实现事务</a></p>
+<h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><p>事务不是指一次的读或者写，而是一系列的操作，必须要<strong>完整的完成</strong>的一系列操作，比如：转账</p>
+<ol>
+<li>查询我的账户余额</li>
+<li>我的账户扣款100元</li>
+<li>100元开始转移</li>
+<li>查询你的账户余额</li>
+<li>你的账户到账100元</li>
+</ol>
+<p>有的DBA或许会认为undo是redo的逆过程，其实不然。redo和undo的作用都可以视为是一种恢复操作：</p>
+<ul>
+<li>redo恢复提交事务修改的页操作，</li>
+<li>而undo回滚行记录到某个特定版本。</li>
+</ul>
+<p>因此两者记录的内容不同，redo通常是物理日志，记录的是页的物理修改操作。undo 是逻辑日志，根据每行记录进行记录。</p>
+<p>Redo用来保证事务的原子性和持久性，Undo能保证事务的一致性，两者也是系统恢复的基础前提。</p>
+<h1 id="原子性（atomicity"><a href="#原子性（atomicity" class="headerlink" title="原子性（atomicity)"></a>原子性（atomicity)</h1><p>一个事务要么全部提交成功，要么全部失败回滚，不能只执行其中的一部分操作，这就是事务的原子性。</p>
+<h2 id="使用undo-log实现"><a href="#使用undo-log实现" class="headerlink" title="使用undo log实现"></a>使用undo log实现</h2><p>将所有对数据的修改（增、删、改）都写入日志（undo log）。如果一个事务中的一部分操作已经成功，但另一部分操作，由于断电&#x2F;系统崩溃&#x2F;其它的软硬件错误而无法成功执行，则通过回溯日志，将已经执行成功的操作撤销，从而达到全部操作失败的目的。</p>
+<p>undo log是逻辑日志，可以理解为：记录和事务操作相反的SQL语句，事务执行insert语句，undo log就记录delete语句。它以追加写的方式记录日志，不会覆盖之前的日志。除此之外undo log还用来实现数据库多版本并发控制（Multiversion Concurrency Control，简称MVCC）</p>
+<h1 id="一致性（consistency"><a href="#一致性（consistency" class="headerlink" title="一致性（consistency)"></a>一致性（consistency)</h1><p>事务开始前和结束后，数据库的完整性约束没有被破坏。比如 A 向 B 转账，不可能 A 扣了钱，B 却没收到。（也就是说，事务开始前、事务结束后，AB两人的总钱数，是一样的）</p>
+<p>通过事务来确保一致性。事实上，原子性、持久性和隔离性都是为了保证<strong>一致性</strong>。</p>
+<h1 id="隔离性（isolation）"><a href="#隔离性（isolation）" class="headerlink" title="隔离性（isolation）"></a>隔离性（isolation）</h1><p>四种隔离级别</p>
+<ol>
+<li>读未提交（Read Uncommited）读到未提交的数据</li>
+<li>读已提交（Read Commited）读到已提交的数据</li>
+<li>可重复读（Repeatable Read) 同一个事务内，多次读的结果是一致的</li>
+<li>串行化</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://www.php.cn/mysql-tutorials-462119.html">我所理解的MySQL之四：事务、隔离级别及MVCC-mysql教程-PHP中文网</a></p>
+<p>举例： N1&#x3D;”刺猬”</p>
+<p><img src="/ACID.assets/803DEA44-C4F3-4379-9575-11E66F603CB4.png" alt="803DEA44-C4F3-4379-9575-11E66F603CB4"></p>
+<h2 id="读未提交-Read-Uncommitted-——脏读"><a href="#读未提交-Read-Uncommitted-——脏读" class="headerlink" title="读未提交(Read Uncommitted)——脏读"></a>读未提交(Read Uncommitted)——脏读</h2><p>在读未提交的隔离级别下，事务中的修改，即便没有提交，对其他事务也都是可见的。</p>
+<p>在上述场景中，若数据库的隔离级别为读未提交，由于事务A可以读取未提交事务B修改后的数据，即时刻3中事务B的修改对事务A可见，所以</p>
+<ol>
+<li>N1&#x3D;重塑，</li>
+<li>N2&#x3D;重塑， </li>
+<li>N3&#x3D;重塑。</li>
+</ol>
+<h2 id="读已提交-Read-Committed-——不可重复读"><a href="#读已提交-Read-Committed-——不可重复读" class="headerlink" title="读已提交(Read Committed)——不可重复读"></a>读已提交(Read Committed)——不可重复读</h2><p>在读已提交的隔离级别下，事务中的修改只有在提交之后，才会对其他事务可见。</p>
+<p>在上述场景中，若数据库的隔离级别为读已提交，由于事务A只能读取事务B提交后的数据，即时刻3中事务B的修改对事务A不可见，N2处的查询在事务B提交之后，故对事务A可见。所以</p>
+<ol>
+<li>N1&#x3D;刺猬，</li>
+<li>N2&#x3D;重塑，</li>
+<li>N3&#x3D;重塑。</li>
+</ol>
+<p>&#x3D;&#x3D;区别度已提交、可重复度&#x3D;&#x3D;</p>
+<h2 id="可重复读"><a href="#可重复读" class="headerlink" title="可重复读"></a>可重复读</h2><p>可重复读是MySQL的默认事务隔离级别。在可重复读的隔离级别下，一个事务中多次查询相同的记录，结果总是一致的。</p>
+<p>在上述场景中，若数据库的隔离级别为可重复读，由于查询N1和N2在一个事务中，所以它们的值都是「刺猬」，而N3是在事 务A提交以后再进行的查询，对事务B的修改是可见的，所以N3&#x3D;重塑。</p>
+<ol>
+<li>N1&#x3D;刺猬，</li>
+<li>N2&#x3D;刺猬，</li>
+<li>N3&#x3D;重塑</li>
+</ol>
+<h3 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h3><ol>
+<li>获取事务自己的版本号，即事务ID</li>
+<li>获取Read View</li>
+<li>查询得到的数据，然后Read View中的事务版本号进行比较。</li>
+<li>如果不符合Read View的可见性规则， 即就需要Undo log中历史快照;</li>
+<li>最后返回符合规则的数据</li>
+</ol>
+<h2 id="可串行化"><a href="#可串行化" class="headerlink" title="可串行化"></a>可串行化</h2><p>在可串行化的隔离级别下，事务都是串行执行的，读会加读锁，写会加写锁，事务不会并发执行，所以也就不会发生异常情况。</p>
+<p>在上述场景中，若数据库的隔离级别为可串行化，首先开启事务A，在开启事务B时被阻塞，直到事务A提交之后才会开启事务B，所以N1&#x3D;刺猬，N2&#x3D;刺猬。而N3处的查询会在事务B提交之后才执行(事 务B先被阻塞，执行顺序在N3查询语句之前)，所以N3&#x3D;重塑。</p>
+<h3 id="实现方式-1"><a href="#实现方式-1" class="headerlink" title="实现方式"></a>实现方式</h3><p>在MVCC的基础之上，通过间隙锁（Gap Lock）来解决的。</p>
+<p>我们都知道InnoDB支持行锁，并且<strong>行锁是锁住 PK索引</strong>。而<strong>间隙锁用来锁定索引记录间隙，确保索引记录的间隙不变</strong>。</p>
+<p>间隙锁是针对事务隔离级别为Repeatable Read或以上级别而已的，<strong>间隙锁和行锁一起组成了Next-Key Lock</strong>。<strong>当InnoDB扫描索引记录的时候，会首先对索引记录加上行锁，再对索引记录两边的间隙加上间隙锁（Gap Lock）</strong>。加上间隙锁之后，其他事务就不能在这个间隙插入记录。这样就有效的防止了幻读的发生。</p>
+<p>默认情况下，InnoDB工作在Repeatable Read的隔离级别下，并且以Next-Key Lock的方式对索引行进行加锁。当查询的索引具有唯一性（主键、唯一索引）时，Innodb存储引擎会对Next-Key Lock进行优化，将其降为行锁，仅仅锁住索引本身，而不是范围（除非锁定不存在的值）。若是普通索引，则会使用Next-Key Lock将记录和间隙一起锁定。</p>
+<h2 id="可重复读和幻读"><a href="#可重复读和幻读" class="headerlink" title="可重复读和幻读"></a>可重复读和幻读</h2><blockquote>
+<p>“在可重复读中，该sql第一次读取到数据后，就将这些数据加锁（悲观锁），其它事务无法修改这些数据，就可以实现可重复读了”。但这种方法却无法锁住insert的数据，所以当事务A先前读取了数据，或者修改了全部数据，事务B还是可以insert数据提交，这时事务A就会发现莫名其妙多了一条之前没有的数据，这就是幻读，不能通过行锁来避免。需要Serializable隔离级别 ，读用读锁，写用写锁，读锁和写锁互斥，这么做可以有效的避免幻读、不可重复读、脏读等问题，但会极大的降低数据库的并发能力。</p>
+</blockquote>
+<p>上面引号内的这段话不大对，对于可重复读，innodb使用的MVCC实现的。</p>
+<p>但是MySQL、ORACLE、PostgreSQL等成熟的数据库，出于性能考虑，都是使用了以乐观锁为理论基础的MVCC（多版本并发控制）来实现。</p>
+<h2 id="脏读-不可重复读："><a href="#脏读-不可重复读：" class="headerlink" title="脏读-不可重复读："></a>脏读-不可重复读：</h2><p><img src="/ACID.assets/803DEA44-C4F3-4379-9575-11E66F603CB4.png" alt="803DEA44-C4F3-4379-9575-11E66F603CB4"></p>
+<p>区别：</p>
+<ol>
+<li>事务 A中发生<strong>两次读</strong>，才会出现 <strong>不可重复读</strong>，N1 与 N2的结果不一样</li>
+<li>脏读，只读是否已提交的，在事务B提交前，N1&#x3D;’重塑’，这就是脏读</li>
+</ol>
+<h2 id="写写问题"><a href="#写写问题" class="headerlink" title="写写问题"></a>写写问题</h2><p>上面的问题 脏读、幻读、不可重复读，都是读写的问题。</p>
+<h3 id="第一类丢失更新"><a href="#第一类丢失更新" class="headerlink" title="第一类丢失更新"></a>第一类丢失更新</h3><p>第一类丢失更新是指：一个事务在撤销的时候，覆盖了另一个事务已提交的更新数据<br>假设事务A和事务B操作同一个账户的金：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务A</th>
+<th>事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>开启事务</td>
+<td>开启事务</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>查询账户余额：500元</td>
+<td>查询账户余额：500元</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>取走100元，剩余400元</td>
+<td>取走100元，剩余400元</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>提交事务，账户余额：400元</td>
+<td>-</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>-</td>
+<td>撤销事务，账户余额：500元</td>
+</tr>
+</tbody></table>
+<p>事务B在撤销事务的时候，覆盖了事务A在T4的时候已经提交的更新数据。A在T3的时候已经取走了100元，此时的余额应该是400元，但是由于事务B开始的时候，余额是500元，所以回滚后，余额也会变成500元。</p>
+<h3 id="第二类丢失更新"><a href="#第二类丢失更新" class="headerlink" title="第二类丢失更新"></a>第二类丢失更新</h3><p>第二类丢失更新是指：一个事务在提交的时候，覆盖了另一个事务已提交的更新数据</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事务A</th>
+<th>事务B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1</td>
+<td>开启事务</td>
+<td>开启事务</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>查询账户余额：500元</td>
+<td>查询账户余额：500元</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>取走100元，剩余400元</td>
+<td>取走100元，剩余400元</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>提交事务，账户余额：400元</td>
+<td>-</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>-</td>
+<td>提交事务，账户余额：400元</td>
+</tr>
+</tbody></table>
+<p>事务A和事务B分别取了100元，所以余额应该为300元。但是事务B在提交的时候，覆盖了事务A已提交的更新数据，所以导致结果出错。</p>
+<h1 id="持久性（Duration）"><a href="#持久性（Duration）" class="headerlink" title="持久性（Duration）"></a>持久性（Duration）</h1><p>事务一旦提交， 其结果就是永久性的。即使发生宕机等故障，数据库也能将数据恢复。</p>
+<p>需要注意的是，只能从事务本身的角度来保证结果的永久性。例如，在事务提交后，所有的变化都是永久的。即使当数据库因为崩溃而需要恢复时，也能保证恢复后提交的数据都不会丢失。但若不是数据库本身发生故障，而是硬盘的损坏则不在考虑范围内</p>
+<h2 id="使用-redo、undo-log实现"><a href="#使用-redo、undo-log实现" class="headerlink" title="使用 redo、undo log实现"></a>使用 redo、undo log实现</h2><p>进行恢复时，根据 redo log重做所有事务包括未提交的事务和回滚了的事务。然后通过Undo Log回滚那些未提交的事务。</p>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Baisitao_/article/details/104723795">面试官：MySQL事务是怎么实现的_Sicimike的博客-CSDN博客_mysql的事务是怎么实现的</a></p>
+<p><code>undo log</code>和<code>redo log</code>并不是直接写到磁盘上的，而是先写入<code>log buffer</code>。再等待合适的时机同步到<code>OS buffer</code>，再由操作系统决定何时刷到磁盘，具体过程如下：</p>
+<p><img src="/ACID.assets/20200425210059474.jpg" alt="在这里插入图片描述"></p>
+<p>既然undo log和redo log都是从log buffer 到 OS buffer，再到磁盘。所以中途还是有可能因为断电&#x2F;硬件故障等原因导致日志丢失。为此MySQL提供了三种持久化方式，innodb_flush_log_at_trx_commit 这个参数主要控制InnoDB将log buffer中的数据写入OS buffer，并刷到磁盘的时间点，取值分别为0，1，2，默认是1。这三个值的意思分别如下</p>
+<p><img src="/ACID.assets/20200308212726564.jpg" alt="log file刷盘策略"></p>
+<h2 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h2><h2 id="undo-log"><a href="#undo-log" class="headerlink" title="undo log"></a>undo log</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/ACID/" data-id="cliribsx60002hlsz4kjmff2e" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/README/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

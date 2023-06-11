@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="问题表名、列名不能加单引号运行不了 123456CREATE TABLE &amp;#x27;t_dept&amp;#x27; (	&amp;#x27;id&amp;#x27; int(11) NOT NULL AUTO_INCREMENT,	&amp;#x27;deptName&amp;#x27; VARCHAR(30) DEFAULT NULL,	&amp;#x27;address&amp;#x27; VARCHAR(40) DEFAULT NULL,	P">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="问题表名、列名不能加单引号运行不了 123456CREATE TABLE &amp;#x27;t_dept&amp;#x27; (	&amp;#x27;id&amp;#x27; int(11) NOT NULL AUTO_INCREMENT,	&amp;#x27;deptName&amp;#x27; VARCHAR(30) DEFAULT NULL,	&amp;#x27;address&amp;#x27; VARCHAR(40) DEFAULT NULL,	P">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204215223502.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211203232005311.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211203232747394.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211203233006849.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211203234201626.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204212552284.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204214455861.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204215737513.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211230203912618.png">
+<meta property="article:published_time" content="2023-06-11T10:43:17.527Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.528Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/%E7%BB%83%E4%B9%A0.assets/image-20211204215223502.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/SQL/练习" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.527Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><h2 id="表名、列名不能加单引号"><a href="#表名、列名不能加单引号" class="headerlink" title="表名、列名不能加单引号"></a>表名、列名不能加单引号</h2><p>运行不了</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">&#x27;t_dept&#x27;</span> (</span><br><span class="line">	<span class="string">&#x27;id&#x27;</span> <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	<span class="string">&#x27;deptName&#x27;</span> <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="string">&#x27;address&#x27;</span> <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (<span class="string">&#x27;id&#x27;</span>)</span><br><span class="line">	)</span><br></pre></td></tr></table></figure>
+
+<p>修改后</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>不是用单引号，而是用键盘左上角的符号 &#96; </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h1 id="针对join的练习"><a href="#针对join的练习" class="headerlink" title="针对join的练习"></a>针对join的练习</h1><p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV12b411K7Zu?p=331">https://www.bilibili.com/video/BV12b411K7Zu?p=331</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_dept (</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">)</span><br><span class="line">	</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">table</span> t_emp(</span><br><span class="line">	`id` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">not</span> <span class="keyword">null</span> auto_increment,</span><br><span class="line">	`name` <span class="type">varchar</span>(<span class="number">20</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	age <span class="type">int</span>(<span class="number">3</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	deptid <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="keyword">null</span>,</span><br><span class="line">	empno <span class="type">int</span> <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	<span class="keyword">primary</span> key (id),</span><br><span class="line">	key idx_dept_id (deptid)</span><br><span class="line">	#<span class="keyword">constraint</span> fk_dept_id <span class="keyword">foreign</span> key (deptid) <span class="keyword">references</span> t_dept (id)</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> t_dept(deptName, address) <span class="keyword">values</span>(<span class="string">&#x27;华山&#x27;</span>, <span class="string">&#x27;华山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;丐帮&#x27;</span>,<span class="string">&#x27;洛阳&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;峨眉&#x27;</span>,<span class="string">&#x27;峨眉山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;武当&#x27;</span>,<span class="string">&#x27;武当山&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;明教&#x27;</span>,<span class="string">&#x27;光明顶&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_dept(deptName,address) <span class="keyword">VALUES</span>(<span class="string">&#x27;少林&#x27;</span>,<span class="string">&#x27;少林寺&#x27;</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;风清扬&#x27;</span>,<span class="number">90</span>,<span class="number">1</span>,<span class="number">100001</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;岳不群&#x27;</span>,<span class="number">50</span>,<span class="number">1</span>,<span class="number">100002</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;令狐冲&#x27;</span>,<span class="number">24</span>,<span class="number">1</span>,<span class="number">100003</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;洪七公&#x27;</span>,<span class="number">70</span>,<span class="number">2</span>,<span class="number">100004</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;乔峰&#x27;</span>,<span class="number">35</span>,<span class="number">2</span>,<span class="number">100005</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;灭绝师太&#x27;</span>,<span class="number">70</span>,<span class="number">3</span>,<span class="number">100006</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;周芷若&#x27;</span>,<span class="number">20</span>,<span class="number">3</span>,<span class="number">100007</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;张三丰&#x27;</span>,<span class="number">100</span>,<span class="number">4</span>,<span class="number">100008</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;张无忌&#x27;</span>,<span class="number">25</span>,<span class="number">5</span>,<span class="number">100009</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_emp(NAME,age,deptId,empno) <span class="keyword">VALUES</span>(<span class="string">&#x27;韦小宝&#x27;</span>,<span class="number">18</span>,<span class="keyword">null</span>,<span class="number">100010</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> `t_dept`</span><br><span class="line"><span class="keyword">add</span>  CEO  <span class="type">INT</span>(<span class="number">11</span>)  ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">2</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">4</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">6</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">3</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">8</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">4</span>;</span><br><span class="line"><span class="keyword">update</span> t_dept <span class="keyword">set</span> CEO<span class="operator">=</span><span class="number">9</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="表"><a href="#表" class="headerlink" title="表"></a>表</h2><h3 id="门派表"><a href="#门派表" class="headerlink" title="门派表"></a>门派表</h3><p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204215223502.png" alt="image-20211204215223502"></p>
+<h3 id="人员表"><a href="#人员表" class="headerlink" title="人员表"></a>人员表</h3><p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png" alt="image-20211204212637520"></p>
+<h2 id="所有有门派的人员信息"><a href="#所有有门派的人员信息" class="headerlink" title="所有有门派的人员信息"></a>所有有门派的人员信息</h2><p>( A、B两表共有)内连接</p>
+<p>inner join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="列出所有用户，并显示其机构信息"><a href="#列出所有用户，并显示其机构信息" class="headerlink" title="列出所有用户，并显示其机构信息"></a>列出所有用户，并显示其机构信息</h2><p>(A的全集)左外连接</p>
+<p>left join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="列出所有门派"><a href="#列出所有门派" class="headerlink" title="列出所有门派"></a>列出所有门派</h2><p>(B的全集)右外连接</p>
+<p>right join</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="差集——所有不入门派的人员"><a href="#差集——所有不入门派的人员" class="headerlink" title="差集——所有不入门派的人员"></a>差集——所有不入门派的人员</h2><p>（A的差集）左外连接取差</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="差集——所有没人入的门派"><a href="#差集——所有没人入的门派" class="headerlink" title="差集——所有没人入的门派"></a>差集——所有没人入的门派</h2><p>（B的差集）右外连接取差</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203232005311.png" alt="image-20211203232005311"></p>
+<h2 id="列出所有人员和机构的对照关系"><a href="#列出所有人员和机构的对照关系" class="headerlink" title="列出所有人员和机构的对照关系."></a>列出所有人员和机构的对照关系.</h2><p>（全连接）union，会去重</p>
+<p>mysql没有全连接，可以使用 <strong>左外连接</strong>+<strong>右外连接取差</strong>，拼起来</p>
+<p>使用<strong>左外连接</strong>+<strong>右外连接</strong>也可以：但是这种写法要注意，union all会出现重复</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">union</span></span><br><span class="line"><span class="keyword">select</span> a.<span class="operator">*</span>,b.<span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203232747394.png" alt="image-20211203232747394"></p>
+<p>使用 union all，不会去重</p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203233006849.png" alt="image-20211203233006849"></p>
+<h2 id="列出所有没入派的人员-和没人入的派"><a href="#列出所有没入派的人员-和没人入的派" class="headerlink" title="列出所有没入派的人员 和没人入的派"></a>列出所有没入派的人员 和没人入的派</h2><p>差集</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b </span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br><span class="line"><span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">union</span></span><br><span class="line"><span class="keyword">select</span> a.<span class="operator">*</span>,b.<span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">right</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">where</span> a.id <span class="keyword">is</span> <span class="keyword">null</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="针对join的拓展练习1"><a href="#针对join的拓展练习1" class="headerlink" title="针对join的拓展练习1"></a>针对join的拓展练习1</h2><h3 id="求各个门派对应的掌门人名称"><a href="#求各个门派对应的掌门人名称" class="headerlink" title="求各个门派对应的掌门人名称"></a>求各个门派对应的掌门人名称</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.name <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.CEO<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="求所有当上掌门人的平均年龄"><a href="#求所有当上掌门人的平均年龄" class="headerlink" title="求所有当上掌门人的平均年龄"></a>求所有当上掌门人的平均年龄</h3><p>感悟对列的操作：相当于是对整列进行操作，所以最终得到的结果只有一行</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">avg</span>(b.age) <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.CEO<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211203234201626.png" alt="image-20211203234201626"></p>
+<h3 id="求所有人物对应的掌门名称"><a href="#求所有人物对应的掌门名称" class="headerlink" title="求所有人物对应的掌门名称:"></a>求所有人物对应的掌门名称:</h3><p><strong>首先是查询到所有门派的掌门</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.id <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo</span><br></pre></td></tr></table></figure>
+
+<p>将查询结果作为一个表b，join起来。join的时候，表b的列，即为表b的查询结果<code>a.name,b.id</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name,b.name <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span>	(<span class="keyword">select</span> a.name,b.id <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line">	<span class="keyword">on</span> a.id<span class="operator">=</span>b.ceo) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+<p>但是写法有很多：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.`name`, b.deptName, c.name <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">on</span> b.CEO<span class="operator">=</span>c.id</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="拓展练习2"><a href="#拓展练习2" class="headerlink" title="拓展练习2"></a>拓展练习2</h2><p>能直接关联就直接关联，不要引入子查询</p>
+<h3 id="列出自己的掌门比自己年龄大的人员"><a href="#列出自己的掌门比自己年龄大的人员" class="headerlink" title="列出自己的掌门比自己年龄大的人员"></a>列出自己的掌门比自己年龄大的人员</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name <span class="keyword">as</span> empName,a.age <span class="keyword">as</span> empAge,c.name <span class="keyword">as</span> CEOName,c.age <span class="keyword">as</span> CEOAge  <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_emp <span class="keyword">as</span> c</span><br><span class="line"><span class="keyword">on</span> b.CEO<span class="operator">=</span>c.id</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&lt;</span>c.age</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h3 id="列出所有年龄低于自己门派平均年龄的人员"><a href="#列出所有年龄低于自己门派平均年龄的人员" class="headerlink" title="列出所有年龄低于自己门派平均年龄的人员"></a>列出所有年龄低于自己门派平均年龄的人员</h3><p>对查询进行拆分：</p>
+<ol>
+<li>门派的平均年龄，得到一个虚拟的表virtual</li>
+<li>t_emp要join 那个virtual</li>
+</ol>
+<p>门派的平均年龄：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptid,<span class="built_in">AVG</span>(a.age) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br></pre></td></tr></table></figure>
+
+<p>整合：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.deptid,<span class="built_in">AVG</span>(a.age) <span class="keyword">as</span> avg <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.deptid <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.deptid</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&lt;</span>b.avg</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) a, customer_store_id <span class="keyword">from</span> customer_store_goods </span><br><span class="line"><span class="keyword">where</span> (<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) a, customer_store_id <span class="keyword">from</span> customer_store_goods <span class="keyword">where</span> a<span class="operator">&gt;</span><span class="number">20</span> <span class="keyword">group</span> <span class="keyword">by</span> customer_store_id) <span class="operator">&gt;</span><span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+<p>注意group by的用法，他对数据进行分组，如何显示分组后的数据：</p>
+<ol>
+<li><p>如果使用了函数，如avg()，则会显示这个分组对应的计算结果。如下面的AVG(a.age)</p>
+</li>
+<li><p>如果没有使用函数，则会返回这组数据的第一个。如下面的name</p>
+</li>
+</ol>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212552284.png" alt="image-20211204212552284"></p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204212637520.png" alt="image-20211204212637520"></p>
+<h3 id="列出至少有2个年龄大于40岁的成员的门门派"><a href="#列出至少有2个年龄大于40岁的成员的门门派" class="headerlink" title="列出至少有2个年龄大于40岁的成员的门门派"></a>列出至少有2个年龄大于40岁的成员的门门派</h3><p>写法有很多种</p>
+<h4 id="写法一"><a href="#写法一" class="headerlink" title="写法一"></a>写法一</h4><ol>
+<li>算出 t_emp中，每个门派，年龄 &gt; 40的人数，并筛选出人数多于1的</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptid,<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：因为对 group by之后的数据进行筛选，就需要 <strong>having</strong></p>
+<ol start="2">
+<li>与t_dept 进行 inner join</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.deptName,b.count <span class="keyword">from</span> t_dept <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.deptid <span class="keyword">as</span> dept,<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">as</span> count <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span>) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.dept</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204214455861.png" alt="image-20211204214455861"></p>
+<h4 id="写法二"><a href="#写法二" class="headerlink" title="写法二"></a>写法二</h4><p>不用子查询，直接两个表级联</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">where</span> a.age<span class="operator">&gt;</span><span class="number">40</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注意： join，相当于是将两个表级联成一个表，on是级联的条件。此时where必须要在 on之后，否则会报错</p>
+<h3 id="至少有2位非掌门人成员的门派"><a href="#至少有2位非掌门人成员的门派" class="headerlink" title="至少有2位非掌门人成员的门派"></a>至少有2位非掌门人成员的门派</h3><ol>
+<li>对t_emp 与 t_dept进行 inner join，得到弟子表</li>
+<li>进行group by</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.deptName, <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id <span class="keyword">and</span> a.id<span class="operator">!=</span>b.CEO</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br><span class="line"><span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)<span class="operator">&gt;=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211204215737513.png" alt="image-20211204215737513"></p>
+<h3 id="列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”"><a href="#列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”" class="headerlink" title="列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”"></a>列出全部人员，并增加一列备注“是否为掌门”，如果是掌门人显示“是”，不是掌门人显示“否”</h3><p>对于条件判断的运用</p>
+<ol>
+<li>对 t_emp 与 t_dept进行 left join</li>
+<li>判断 a.id&#x3D;b.CEO</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name, a.age, b.deptName, (<span class="keyword">case</span> <span class="keyword">when</span> a.id<span class="operator">=</span>b.CEO <span class="keyword">then</span> <span class="string">&#x27;是&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;否&#x27;</span> <span class="keyword">end</span>) <span class="keyword">as</span> <span class="string">&#x27;是否为掌门&#x27;</span></span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id </span><br></pre></td></tr></table></figure>
+
+<p>注：case的语法</p>
+<h3 id="列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄-gt-50显示“老鸟”"><a href="#列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄-gt-50显示“老鸟”" class="headerlink" title="列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄&gt;50显示“老鸟”"></a>列出全部门派，并增加一列备注“老鸟or菜鸟”，若门派的平均值年龄&gt;50显示“老鸟”</h3><ol>
+<li>对 t_emp 与 t_dept进行 inner join</li>
+<li>根据 b.id进行group by</li>
+<li>对 group by进行 avg(a.age)，并判断</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> b.id, b.deptName, <span class="built_in">avg</span>(a.age), <span class="built_in">count</span>(<span class="operator">*</span>), if(<span class="built_in">avg</span>(a.age)<span class="operator">&gt;</span><span class="number">50</span>, <span class="string">&#x27;老鸟&#x27;</span>,<span class="string">&#x27;菜鸟&#x27;</span>) <span class="keyword">as</span> <span class="string">&#x27;老鸟or菜鸟&#x27;</span></span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> t_dept <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.deptid<span class="operator">=</span>b.id</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.id</span><br></pre></td></tr></table></figure>
+
+<p>注：if的语法</p>
+<h3 id="显示每个门门派年龄最大的人"><a href="#显示每个门门派年龄最大的人" class="headerlink" title="显示每个门门派年龄最大的人"></a>显示每个门门派年龄最大的人</h3><ol>
+<li>根据 a.deptid进行group by，并计算出其中年龄的最大值</li>
+<li>使用t_emp再进行一次关联</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> (<span class="keyword">select</span> a.id, a.deptid, <span class="built_in">max</span>(a.age) <span class="keyword">as</span> maxAge</span><br><span class="line"><span class="keyword">from</span> t_emp <span class="keyword">as</span> a </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a.deptid) <span class="keyword">as</span> b</span><br><span class="line"><span class="keyword">on</span> a.id<span class="operator">=</span>b.id</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="显示每个门门派年龄第二大的人"><a href="#显示每个门门派年龄第二大的人" class="headerlink" title="显示每个门门派年龄第二大的人"></a>显示每个门门派年龄第二大的人</h3><p>需要用到自定义参数</p>
+<ol>
+<li>根据 a.deptid, a.age，对t_emp进行排序</li>
+<li>对排序结果进行赋值，得到新的表 virtual</li>
+<li>对virtual进行筛选判断</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="variable">@rank</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="variable">@last_deptid</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="variable">@last_age</span><span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span>(<span class="keyword">select</span> <span class="operator">*</span>, </span><br><span class="line">		if(a.deptid<span class="operator">=</span><span class="variable">@last_deptid</span>, </span><br><span class="line">			if(a.age<span class="operator">=</span><span class="variable">@last_age</span>, <span class="variable">@rank</span>, <span class="variable">@rank</span>:<span class="operator">=</span><span class="variable">@rank</span><span class="operator">+</span><span class="number">1</span>) ,<span class="variable">@rank</span>:<span class="operator">=</span><span class="number">1</span> ) <span class="keyword">as</span> rk, </span><br><span class="line">		<span class="variable">@last_deptid</span>:<span class="operator">=</span>a.deptid <span class="keyword">as</span> last_deptid, </span><br><span class="line">        <span class="variable">@last_age</span>:<span class="operator">=</span>a.age <span class="keyword">as</span> last_age</span><br><span class="line">	<span class="keyword">from</span> t_emp <span class="keyword">as</span> a</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span> a.deptid, a.age <span class="keyword">desc</span>) <span class="keyword">as</span> a</span><br><span class="line"><span class="keyword">where</span> a.rk<span class="operator">=</span><span class="number">2</span></span><br></pre></td></tr></table></figure>
+
+<p>注：自定义参数</p>
+<p><img src="/%E7%BB%83%E4%B9%A0.assets/image-20211230203912618.png" alt="image-20211230203912618"></p>
+<p>注意上图的查询结果，有rk、last_deptid、last_age这三列</p>
+<h1 id="海量数据"><a href="#海量数据" class="headerlink" title="海量数据"></a>海量数据</h1><h2 id="创建数据"><a href="#创建数据" class="headerlink" title="创建数据"></a>创建数据</h2><h3 id="创建表："><a href="#创建表：" class="headerlink" title="创建表："></a>创建表：</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept(</span><br><span class="line">	id <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	deptName <span class="type">VARCHAR</span>(<span class="number">30</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">  address <span class="type">VARCHAR</span>(<span class="number">40</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	ceo <span class="type">INT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">) ENGINE<span class="operator">=</span>INNODB AUTO_INCREMENT<span class="operator">=</span><span class="number">1</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp(</span><br><span class="line">	id <span class="type">INT</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	empno <span class="type">INT</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	name <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	age <span class="type">INT</span>(<span class="number">3</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	deptId <span class="type">INT</span> (<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (id)</span><br><span class="line">	#<span class="keyword">CONSTRAINT</span> fk_dept_id <span class="keyword">FOREIGN</span> KEY (deptId) <span class="keyword">REFERENCES</span> t_dept(id)</span><br><span class="line">)ENGINE<span class="operator">=</span>INNODB AUTO_INCREMENT<span class="operator">=</span><span class="number">1</span> <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="填充数据"><a href="#填充数据" class="headerlink" title="填充数据"></a>填充数据</h3><p>主从复制，使用bin.log，<a target="_blank" rel="noopener" href="https://blog.csdn.net/y_zilong/article/details/116950207">MySQL的主从复制_y_zilong的博客-CSDN博客_mysql主从复制</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#mysql为避免主从复制出现不一致的问题，会默认关闭用户自定义函数</span><br><span class="line">#不一致，比如：master使用了系统时间，slave也使用系统时间，就会出现不一致</span><br><span class="line">SHOW VARIABLES LIKE &#x27;log_bin_trust_function_creators&#x27;;</span><br><span class="line"></span><br><span class="line">#用户想要自定义函数，就要打开开关</span><br><span class="line">SET GLOBAL log_bin_trust_function_creators=1;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>创建随机字符串：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> rand_string(n <span class="type">INT</span>) <span class="keyword">RETURNS</span> <span class="type">VARCHAR</span>(<span class="number">255</span>)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> chars_str <span class="type">VARCHAR</span>(<span class="number">100</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;abcdefghijklmnopqrstuvwxyzABCDEFJHIJKLMNOPQRSTUVWXYZ&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> return_str <span class="type">VARCHAR</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	WHILE i <span class="operator">&lt;</span> n DO</span><br><span class="line">		<span class="keyword">SET</span> return_str <span class="operator">=</span>CONCAT(return_str,<span class="built_in">SUBSTRING</span>(chars_str,<span class="built_in">FLOOR</span>(<span class="number">1</span> <span class="operator">+</span>RAND()<span class="operator">*</span><span class="number">52</span>),<span class="number">1</span>));</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span><span class="number">1</span>;</span><br><span class="line">	<span class="keyword">END</span> WHILE;</span><br><span class="line">	<span class="keyword">RETURN</span> return_str;</span><br><span class="line"><span class="keyword">END</span> $$</span><br></pre></td></tr></table></figure>
+
+
+
+<p>创建随机数字：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> rand_num (from_num <span class="type">INT</span> ,to_num <span class="type">INT</span>) <span class="keyword">RETURNS</span> <span class="type">INT</span>(<span class="number">11</span>)</span><br><span class="line"><span class="keyword">BEGIN</span> </span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">SET</span> i<span class="operator">=</span><span class="built_in">FLOOR</span>(from_num <span class="operator">+</span>RAND()<span class="operator">*</span>(to_num<span class="operator">-</span>from_num<span class="operator">+</span><span class="number">1</span>));</span><br><span class="line">	<span class="keyword">RETURN</span> i;</span><br><span class="line"><span class="keyword">END</span>$$</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>创建员工：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> insert_emp(start_num <span class="type">INT</span>, max_num <span class="type">INT</span>)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	#<span class="keyword">set</span> autocommit<span class="operator">=</span><span class="number">0</span>把autocommit设置成<span class="number">0</span></span><br><span class="line">	<span class="keyword">SET</span> autocommit<span class="operator">=</span> <span class="number">0</span>; </span><br><span class="line">	REPEAT</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span><span class="number">1</span>;</span><br><span class="line">		<span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp (empno, name ,age ,deptid ) <span class="keyword">VALUES</span> ((start_num<span class="operator">+</span>i) ,rand_string(<span class="number">6</span>), rand_num(<span class="number">30</span>,<span class="number">50</span>),rand_num(<span class="number">1</span>,<span class="number">10000</span>));</span><br><span class="line">		UNTIL i<span class="operator">=</span> max_num</span><br><span class="line">	<span class="keyword">END</span> REPEAT;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="keyword">CALL</span> insert_emp(<span class="number">100000</span>,<span class="number">500000</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>创建部门：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> insert_dept( max_num <span class="type">INT</span> )</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> i <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">SET</span> autocommit <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">	REPEAT</span><br><span class="line">		<span class="keyword">SET</span> i<span class="operator">=</span>i<span class="operator">+</span> <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">INSERT</span> <span class="keyword">INTO</span> dept ( deptname,address,ceo ) <span class="keyword">VALUES</span></span><br><span class="line">(rand_string(<span class="number">8</span>),rand_string(<span class="number">10</span>),rand_num(<span class="number">1</span> ,<span class="number">500000</span>));</span><br><span class="line">		UNTIL i <span class="operator">=</span> max_num</span><br><span class="line"><span class="keyword">END</span> REPEAT;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="keyword">CALL</span> insert_dept(<span class="number">10000</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>批量删除索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># 批量删除索引</span><br><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> proc_drop_index (dbname <span class="type">VARCHAR</span>(<span class="number">200</span>),tablename <span class="type">VARCHAR</span>(<span class="number">200</span>))</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">	<span class="keyword">DECLARE</span> done <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> ct <span class="type">INT</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> _index <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	#<span class="keyword">DECLARE</span> sql_str <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> _cur <span class="keyword">CURSOR</span> <span class="keyword">FOR</span> <span class="keyword">SELECT</span> INDEX_NAME <span class="keyword">FROM</span> information_schema.STATISTICS <span class="keyword">WHERE</span> TABLE_NAME<span class="operator">=</span>tablename <span class="keyword">AND</span> TABLE_SCHEMA<span class="operator">=</span><span class="string">&#x27;first&#x27;</span> <span class="keyword">AND</span> INDEX_NAME<span class="operator">&lt;&gt;</span><span class="string">&#x27;PRIMARY&#x27;</span> <span class="keyword">AND</span> SEQ_IN_INDEX<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line">	<span class="keyword">DECLARE</span> CONTINUE HANDLER <span class="keyword">FOR</span> <span class="keyword">NOT</span> FOUND <span class="keyword">set</span> done<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line">	<span class="keyword">OPEN</span> _cur;</span><br><span class="line">	<span class="keyword">FETCH</span> _cur <span class="keyword">INTO</span> _index;</span><br><span class="line">	WHILE _index<span class="operator">&lt;&gt;</span><span class="string">&#x27;&#x27;</span> DO</span><br><span class="line">		<span class="keyword">SET</span> <span class="variable">@str</span><span class="operator">=</span>CONCAT(<span class="string">&#x27;drop index&#x27;</span>, _index, <span class="string">&#x27;ON tablename&#x27;</span>);</span><br><span class="line">		<span class="keyword">PREPARE</span> sql_str <span class="keyword">FROM</span> <span class="variable">@str</span>;</span><br><span class="line">		<span class="keyword">EXECUTE</span> sql_str;</span><br><span class="line">		<span class="keyword">DEALLOCATE</span> <span class="keyword">PREPARE</span> sql_str;</span><br><span class="line">		<span class="keyword">SET</span> _index<span class="operator">=</span><span class="string">&#x27;&#x27;</span>;</span><br><span class="line">		<span class="keyword">FETCH</span> _cur <span class="keyword">INTO</span> _index;</span><br><span class="line">	<span class="keyword">END</span> WHILE;</span><br><span class="line"><span class="keyword">CLOSE</span> _cur;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line"></span><br><span class="line"><span class="keyword">CALL</span> proc_drop_index (<span class="string">&#x27;mydb&#x27;</span>, <span class="string">&#x27;emp&#x27;</span>) ;</span><br><span class="line"><span class="keyword">CALL</span> proc_drop_index (<span class="string">&#x27;mydb&#x27;</span>, <span class="string">&#x27;dept&#x27;</span>) ;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="开始分析"><a href="#开始分析" class="headerlink" title="开始分析"></a>开始分析</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E7%BB%83%E4%B9%A0/" data-id="cliribsxh000ihlszh6vofxfd" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E5%9F%BA%E7%A1%80/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>

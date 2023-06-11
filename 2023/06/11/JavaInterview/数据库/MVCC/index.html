@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="[toc] 全网最全的一篇数据库MVCC详解，不全我负责-mysql教程-PHP中文网 MVCC ReadView介绍 - IUNI_JM - 博客园 (cnblogs.com) 所谓的MVCC指的就是在使用READ COMMITTD、REPEATABLE READ这两种隔离级别的事务在执行普通的SEELCT操作时访问记录的版本链的过程，这样子可以使不同事务的读-写、写-读操作并发执行，从而提升系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="[toc] 全网最全的一篇数据库MVCC详解，不全我负责-mysql教程-PHP中文网 MVCC ReadView介绍 - IUNI_JM - 博客园 (cnblogs.com) 所谓的MVCC指的就是在使用READ COMMITTD、REPEATABLE READ这两种隔离级别的事务在执行普通的SEELCT操作时访问记录的版本链的过程，这样子可以使不同事务的读-写、写-读操作并发执行，从而提升系">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://balanced-b-tree.github.io/MVCC.assets/7d239fc720ed0f548d4d994272398847-2.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/MVCC.assets/7d239fc720ed0f548d4d994272398847-3.png">
+<meta property="og:image" content="https://balanced-b-tree.github.io/MVCC.assets/640">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1PmpzLBV5zbOkvrsTxZqbOic8vmIxzgrAY6ftdVpq4b41ZR3SU6IHOH9JIQ7AaDIJQY1GjQ5b7Rq11BQw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1">
+<meta property="og:image" content="https://balanced-b-tree.github.io/MVCC.assets/640">
+<meta property="og:image" content="https://balanced-b-tree.github.io/MVCC.assets/640">
+<meta property="article:published_time" content="2023-06-11T10:43:17.482Z">
+<meta property="article:modified_time" content="2023-06-11T10:43:17.482Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://balanced-b-tree.github.io/MVCC.assets/7d239fc720ed0f548d4d994272398847-2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://balanced-b-tree.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-JavaInterview/数据库/MVCC" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.482Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://www.php.cn/mysql-tutorials-460111.html">全网最全的一篇数据库MVCC详解，不全我负责-mysql教程-PHP中文网</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jmliao/p/13204946.html">MVCC ReadView介绍 - IUNI_JM - 博客园 (cnblogs.com)</a></p>
+<p>所谓的MVCC指的就是在使用READ COMMITTD、REPEATABLE READ这两种隔离级别的事务在执行普通的SEELCT操作时访问记录的<strong>版本链</strong>的过程，这样子可以使不同事务的读-写、写-读操作并发执行，从而提升系统性能。</p>
+<h1 id="MVCC概念"><a href="#MVCC概念" class="headerlink" title="MVCC概念"></a>MVCC概念</h1><p>全称Multi-Version Concurrency Control，即<strong>多版本并发控制</strong>，是“维持一个数据的多个版本，使<strong>读写操作没有冲突</strong>”的一个抽象概念，快照读是其具体实现。主要是为了提高数据库的并发性能。</p>
+<ul>
+<li>MVCC与悲观和乐观并发控制并不是对立的，很直观的一点MVCC可以在不加锁的情况下解决读-写冲突，并不能解决写-写冲突，写操作还是需要上锁</li>
+<li>MVCC可以与悲观并发或乐观并发结合使用来提高并发的性能</li>
+</ul>
+<p>以下文章都是围绕InnoDB引擎来讲，因为myIsam不支持事务。</p>
+<p>同一行数据平时发生读写请求时，会上锁阻塞住。但mvcc用<strong>快照读</strong>更好的方式去处理读—写请求，做到在<strong>发生读—写请求冲突时不用加锁。</strong>这个读是指的<strong>快照读</strong>（<strong>快照读</strong>就是读<strong>数据行的以前版本</strong>），而不是<strong>当前读</strong>，当前读是一种加锁操作，是悲观锁。</p>
+<p>mvcc用来解决读—写冲突的无锁并发控制，就是为事务分配单向增长的时间戳。为每个数据修改保存一个版本，版本与事务时间戳相关联。</p>
+<p>读操作只读取该事务开始前的数据库快照。</p>
+<h2 id="MVCC了解决了："><a href="#MVCC了解决了：" class="headerlink" title="MVCC了解决了："></a>MVCC了解决了：</h2><ul>
+<li>并发读-写时：可以做到读操作不阻塞写操作，同时写操作也不会阻塞读操作。</li>
+<li>解决脏读、幻读、不可重复读等事务隔离问题，但不能解决 写-写 更新丢失问题（现实中应该不存在 写-写问题，因为会上写锁）。</li>
+</ul>
+<p>因此有了下面提高并发性能的组合拳：</p>
+<ul>
+<li><p>MVCC + 悲观锁（写锁）：MVCC解决读写冲突，悲观锁解决写写冲突</p>
+</li>
+<li><p>MVCC + 乐观锁：MVCC解决读写冲突，乐观锁解决读写冲突</p>
+</li>
+</ul>
+<h2 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h2><p>它读取的数据库记录，都是当前最新的版本，会对当前读取的数据进行加锁，防止其他事务修改数据。是悲观锁的一种操作。</p>
+<p>如下操作都是当前读：</p>
+<ul>
+<li>select lock in share mode (共享锁)</li>
+<li>select for update (排他锁)</li>
+<li>update (排他锁)</li>
+<li>insert (排他锁)</li>
+<li>delete (排他锁)</li>
+<li>串行化事务隔离级别</li>
+</ul>
+<h2 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h2><p>快照读的实现是基于多版本并发控制，即MVCC，既然是多版本，那么快照读读到的数据不一定是当前最新的数据，有可能是之前历史版本的数据。</p>
+<p>如下操作是快照读：</p>
+<ul>
+<li>不加锁的select操作（注：事务级别不是串行化）</li>
+</ul>
+<p>MySQL对<code>insert</code>、<code>update</code>和<code>delete</code>语句所使用的<strong>当前读</strong>（current read）。因为涉及到数据的修改，所以MySQL必须拿到最新的数据才能修改，所以涉及到数据的修改肯定不能使用<strong>快照读</strong>（snapshot read）。</p>
+<h1 id="MVCC的实现原理"><a href="#MVCC的实现原理" class="headerlink" title="MVCC的实现原理"></a>MVCC的实现原理</h1><p>它的实现原理主要是<strong>版本链</strong>，<strong>undo日志</strong> ，<strong>Read View</strong> 来实现的</p>
+<h2 id="版本链"><a href="#版本链" class="headerlink" title="版本链"></a>版本链</h2><p>我们数据库中的每行数据，除了我们肉眼看见的数据，还有几个隐藏字段，得开天眼才能看到。分别是db_trx_id、db_roll_pointer、db_row_id。</p>
+<ul>
+<li><p>db_trx_id：6byte，最近修改(修改&#x2F;插入)事务ID：记录创建这条记录&#x2F;最后一次修改该记录的事务ID。</p>
+</li>
+<li><p>db_roll_pointer（版本链关键）：7byte，回滚指针，指向这条记录的上一个版本（存储于rollback segment里）</p>
+</li>
+<li><p>db_row_id：6byte，隐含的自增ID（隐藏主键），如果数据表没有主键，InnoDB会自动以db_row_id产生一个聚簇索引。</p>
+</li>
+<li><p>delete_flag：（就跟计组Cache中的标记位一样）实际还有一个删除flag隐藏字段, 记录被更新或删除并不代表真的删除，而是删除flag变了</p>
+</li>
+</ul>
+<p><img src="/MVCC.assets/7d239fc720ed0f548d4d994272398847-2.png" alt="img"></p>
+<p>如上图，db_row_id是数据库默认为该行记录生成的唯一隐式主键，db_trx_id是当前操作该记录的事务ID，而db_roll_pointer是一个回滚指针，用于配合undo日志，指向上一个旧版本。</p>
+<p>每次对数据库记录进行改动，都会记录一条undo日志，每条undo日志也都有一个roll_pointer属性（INSERT操作对应的undo日志没有该属性，因为该记录并没有更早的版本），可以将这些undo日志都连起来，串成一个链表，所以现在的情况就像下图一样：</p>
+<p><img src="/MVCC.assets/7d239fc720ed0f548d4d994272398847-3.png" alt="img"></p>
+<h2 id="undo日志"><a href="#undo日志" class="headerlink" title="undo日志"></a>undo日志</h2><p>Undo log 主要用于记录数据被修改之前的日志，在表信息修改之前先会把数据拷贝到undo log里。</p>
+<p>当事务进行回滚时可以通过undo log 里的日志进行数据还原。</p>
+<h1 id="Read-View-读-操作的-视图"><a href="#Read-View-读-操作的-视图" class="headerlink" title="Read View 读(操作的)视图"></a>Read View 读(操作的)视图</h1><p>事务进行<strong>快照读</strong>操作的时候生产的**读视图(Read View)**，在该事务执行的快照读的那一刻，会生成数据库系统当前的一个快照。</p>
+<p>记录并维护<strong>系统当前活跃事务的ID</strong>(没有commit的事务ID。当每个事务开启时，都会被分配一个ID, 这个ID是递增的，所以越新的事务，ID值越大)列表 list，该list 是系统中当前不应该被本事务看到的其他事务id列表。</p>
+<p>Read View主要是用来做可见性判断的：</p>
+<ol>
+<li>即当我们某个事务执行快照读的时候，对该记录创建一个Read View读视图，</li>
+<li>并将 trx_id（表中每个 roll中存储的 db_trx_id，即最后一次修改该 roll的事务id） 当做作条件，来判断当前事务能够看到哪个版本的数据，既可能是当前最新的数据，也有可能是该行记录的undo log里面的某个版本的数据。</li>
+</ol>
+<h2 id="Read-View几个属性"><a href="#Read-View几个属性" class="headerlink" title="Read View几个属性"></a>Read View几个属性</h2><table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">当前系统中那些活跃(未提交)的读写事务ID, 它数据结构为一个List。</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">表示生成Read View时，系统中应该分配给下一个事务的id值。</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">表示在生成Read View时，当前系统中活跃的读写事务中最小的事务id，即m_ids中的最小值。</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">创建当前Read View的事务ID</td>
+</tr>
+</tbody></table>
+<p>判断是否可以直接读，如果不能<code>直接读</code>，则需要去 undo log中<code>快照读</code></p>
+<ul>
+<li><code>trx_id</code> &#x3D;&#x3D; <code>creator_trx_id</code>，则<strong>可以访问</strong>：如果被访问版本的<code>trx_id</code>属性值与<code>ReadView</code>中的<code>creator_trx_id</code>值相同，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问。</li>
+<li><code>trx_id</code>  &lt;<code>min_trx_id</code>，则<strong>可以访问</strong>：如果被访问版本的<code>trx_id</code>属性值小于<code>ReadView</code>中的<code>min_trx_id</code>值，表明生成该版本的事务在当前事务生成<code>ReadView</code>前已经提交，所以该版本可以被当前事务访问。</li>
+<li><code>max_trx_id</code> &lt;&#x3D; <code>trx_id</code> ，则<strong>不可以访问</strong>： 如果被访问版本的<code>trx_id</code>属性值大于或等于<code>ReadView</code>中的<code>max_trx_id</code>值，表明生成该版本的事务在当前事务生成<code>ReadView</code>后才开启，所以该版本不可以被当前事务访问。</li>
+<li><code>min_trx_id</code>&lt;&#x3D; <code>trx_id</code> &lt; <code>max_trx_id</code>，则需分析<code>trx_id∈m_ids</code> 和 <code>trx_id∉m_ids</code>： 如果被访问版本的<code>trx_id</code>属性值在<code>ReadView</code>的<code>min_trx_id</code>和<code>max_trx_id</code>之间，那就需要判断一下<code>trx_id</code>属性值是不是在<code>m_ids</code>列表中，如果在，说明创建<code>ReadView</code>时生成该版本的事务还是活跃的，该版本<strong>不可以访问</strong>；如果不在，说明创建<code>ReadView</code>时生成该版本的事务已经被提交，该版本<strong>可以访问</strong>。</li>
+</ul>
+<p>注：以上 trx_id是当前被访问的行的 db_trx_id</p>
+<h1 id="根据-Read-View实现隔离级别"><a href="#根据-Read-View实现隔离级别" class="headerlink" title="根据 Read View实现隔离级别"></a>根据 Read View实现隔离级别</h1><h2 id="读已提交-和-可重复度"><a href="#读已提交-和-可重复度" class="headerlink" title="读已提交 和 可重复度"></a>读已提交 和 可重复度</h2><p>上面所讲的Read View用于支持RC（Read Committed，读提交）和RR（Repeatable Read，可重复读）隔离级别的实现。RR、RC生成时机</p>
+<ul>
+<li>RC隔离级别下，是每个快照读都会生成并获取最新的Read View；</li>
+<li>而在RR隔离级别下，则是<strong>同一个事务中的第一个快照读</strong>才会创建Read View, 之后的快照读获取的都是同一个Read View，之后的查询就不会重复生成了，所以一个事务的查询结果每次都是一样的。</li>
+</ul>
+<h2 id="可重复读"><a href="#可重复读" class="headerlink" title="可重复读"></a>可重复读</h2><ol>
+<li>获取事务自己的版本号，即事务ID</li>
+<li>获取Read View</li>
+<li>查询得到的数据，然后Read View中的事务版本号进行比较。</li>
+<li>如果不符合Read View的可见性规则， 即就需要Undo log中历史快照;</li>
+<li>最后返回符合规则的数据</li>
+</ol>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p><img src="/MVCC.assets/640" alt="图片"></p>
+<p>在可重复读（RR）隔离级别下，一个事务里只会获取一次<code>read view</code>，都是副本共用的，从而保证每次查询的数据都是一样的。</p>
+<p>假设当前有一张core_user表，插入一条初始化数据,如下：</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1PmpzLBV5zbOkvrsTxZqbOic8vmIxzgrAY6ftdVpq4b41ZR3SU6IHOH9JIQ7AaDIJQY1GjQ5b7Rq11BQw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>基于MVCC，我们来看看执行流程</p>
+<ol>
+<li>A开启事务，首先得到一个事务ID为100</li>
+<li>B开启事务，得到事务ID为101</li>
+<li>事务A生成一个Read View，read view对应的值如下</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">100，101</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">102</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">100</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">100</td>
+</tr>
+</tbody></table>
+<p>然后回到版本链：开始从版本链中挑选可见的记录：</p>
+<p><img src="/MVCC.assets/640" alt="图片"></p>
+<p>由图可以看出，最新版本的列name的内容是孙权，该版本的trx_id值为100。开始执行<strong>read view可见性规则</strong>校验：</p>
+<blockquote>
+<p>min_limit_id(100) &lt;&#x3D; trx_id（100）&lt;102;<br>creator_trx_id &#x3D; trx_id &#x3D;100;</p>
+</blockquote>
+<p>由此可得，trx_id&#x3D;100的这个记录，当前事务是可见的。所以查到是<strong>name为孙权</strong>的记录。</p>
+<ol start="4">
+<li>事务B进行修改操作，把名字改为曹操。把原数据拷贝到undo log,然后对数据进行修改，标记事务ID和上一个数据版本在undo log的地址。</li>
+</ol>
+<p><img src="/MVCC.assets/640" alt="图片"></p>
+<ol start="5">
+<li>事务B提交事务</li>
+<li>事务A再次执行查询操作，因为是RR（可重复读）隔离级别，因此会复用老的Read View副本，Read View对应的值如下</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">m_ids</td>
+<td align="left">100，101</td>
+</tr>
+<tr>
+<td align="left">max_limit_id</td>
+<td align="left">102</td>
+</tr>
+<tr>
+<td align="left">min_limit_id</td>
+<td align="left">100</td>
+</tr>
+<tr>
+<td align="left">creator_trx_id</td>
+<td align="left">100</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" data-id="cliribsx70003hlsz3yps0wvq" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/ACID/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">June 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/06/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/Gitee%E6%90%AD%E5%BB%BA%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/hexo/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E7%B4%A2%E5%BC%95/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
