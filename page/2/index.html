@@ -73,6 +73,50 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-JavaInterview/数据库/基本概念" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T10:43:17.561Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>[toc]</p>
+<h1 id="回表"><a href="#回表" class="headerlink" title="回表"></a>回表</h1><p>什么是回表？</p>
+<p>简单来说就是数据库根据索引找到了指定的记录所在行后，还需要根据rowid再次到数据块里取数据的操作。</p>
+<p>比如这样的执行计划：</p>
+<ol>
+<li>先索引扫描，得到rowid</li>
+<li>再通过rowid去取索引中未能提供的数据，即为回表。</li>
+</ol>
+<p>“回表”一般就是指执行计划里显示的“<strong>TABLE ACCESS BY INDEX ROWID</strong>”。</p>
+<p>怎么避免回表？</p>
+<p>将需要的字段放在索引中去。查询的时候就能避免回表。但是不要刻意去避免回表，那样代价太了。也不是将所有的字段都放在所有中。</p>
+<h1 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36551991/article/details/106594768">覆盖索引是什么？一篇文章告诉你_way_more的博客-CSDN博客_覆盖索引是什么</a></p>
+<p>覆盖索引是select的数据列只用从索引中就能够取得，不必读取数据行，换句话说查询列要被所建的索引覆盖。</p>
+<p>与“回表”一起理解</p>
+<h1 id="分区表"><a href="#分区表" class="headerlink" title="分区表"></a>分区表</h1><p>分区表是一个独立的逻辑表，但是底层由多个物理子表组成。</p>
+<p>当查询条件的数据分布在某一个分区的时候，查询引擎只会去某一个分区查询，而不是遍历整个表。在管理层面，如果需要删除某一个分区的数据，只需要删除对应的分区即可。</p>
+<h2 id="按照范围分区"><a href="#按照范围分区" class="headerlink" title="按照范围分区"></a>按照范围分区</h2><h2 id="list分区"><a href="#list分区" class="headerlink" title="list分区"></a>list分区</h2><h2 id="hash分区"><a href="#hash分区" class="headerlink" title="hash分区"></a>hash分区</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" data-id="clirje8o10008yoszeqhveb3m" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-JavaInterview/数据库/分库分表" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" class="article-date">
@@ -751,375 +795,6 @@
 
 
   
-    <article id="post-JavaInterview/数据库/SQL/优化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" class="article-date">
-  <time class="dt-published" datetime="2023-06-11T10:43:17.517Z" itemprop="datePublished">2023-06-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>在进行优化时，将外关联，变为内关联，是因为可以减少执行引擎执行的次数，降低存储引擎读取的次数</p>
-<h1 id="大表优化"><a href="#大表优化" class="headerlink" title="大表优化"></a>大表优化</h1><p>当MySQL单表记录数过大时，数据库的性能会明显下降，一些常见的优化措施如下：</p>
-<ul>
-<li>限定数据的范围。比如：用户在查询历史信息的时候，可以控制在一个月的时间范围内；</li>
-<li>读写分离：经典的数据库拆分方案，主库负责写，从库负责读；</li>
-<li>通过分库分表的方式进行优化，主要有垂直拆分和水平拆分。</li>
-</ul>
-<h1 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/VZXunsXEWAdRr3bup7L9yA">聊聊分库分表 (qq.com)</a></p>
-<h2 id="瓶颈"><a href="#瓶颈" class="headerlink" title="瓶颈"></a>瓶颈</h2><h3 id="IO瓶颈"><a href="#IO瓶颈" class="headerlink" title="IO瓶颈"></a>IO瓶颈</h3><p>第一种：磁盘读IO瓶颈，热点数据太多，数据库缓存放不下，每次查询时会产生大量的IO，降低查询速度 -&gt; 分库和垂直分表。</p>
-<p>第二种：网络IO瓶颈，请求的数据太多，网络带宽不够 -&gt; 分库。</p>
-<h3 id="CPU瓶颈"><a href="#CPU瓶颈" class="headerlink" title="CPU瓶颈"></a>CPU瓶颈</h3><p><strong>第一种</strong>：SQL问题，如SQL中包含join，group by，order by，非索引字段条件查询等，增加CPU运算的操作 -&gt; SQL优化，建立合适的索引，在业务Service层进行业务计算。</p>
-<p><strong>第二种</strong>：单表数据量太大，查询时扫描的行太多，SQL效率低，CPU率先出现瓶颈 -&gt; 水平分表。</p>
-<h2 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h2><h3 id="水平分表"><a href="#水平分表" class="headerlink" title="水平分表"></a>水平分表</h3><p>IO未瓶颈，CPU瓶颈了</p>
-<p><strong>场景：</strong>系统绝对并发量并没有上来，只是单表的数据量太多，影响了SQL效率，加重了CPU负担，以至于成为瓶颈。</p>
-<p><strong>分析：</strong>表的数据量少了，单次SQL执行效率高，自然减轻了CPU的负担。</p>
-<h3 id="垂直分表"><a href="#垂直分表" class="headerlink" title="垂直分表"></a>垂直分表</h3><p>表内存在大量非热点数据的列，使得每次IO得到的有效数据较少</p>
-<p><strong>场景：</strong>系统绝对并发量并没有上来，表的记录并不多，但是字段多，并且热点数据和非热点数据在一起，<strong>单行数据所需的存储空间较大。以至于数据库缓存的数据行减少</strong>，查询时会去读磁盘数据产生大量的随机读IO，产生IO瓶颈。</p>
-<p>分表：可以用列表页和详情页来帮助理解。垂直分表的拆分原则是<strong>将热点数据（可能会冗余经常一起查询的数据）放在一起作为主表，非热点数据放在一起作为扩展表。</strong>这样更多的热点数据就能被缓存下来，进而减少了随机读IO。拆了之后，要想获得全部数据就需要关联两个表来取数据。</p>
-<p>但记住，千万别用join，因为join不仅会增加CPU负担并且会讲两个表耦合在一起（必须在一个数据库实例上）。<strong>关联数据，应该在业务Service层做文章</strong>，分别获取主表和扩展表数据然后用关联字段关联得到全部数据。</p>
-<h2 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h2><h3 id="水平分库"><a href="#水平分库" class="headerlink" title="水平分库"></a>水平分库</h3><p>网络IO瓶颈</p>
-<p><strong>分析：</strong>库多了，io和cpu的压力自然可以成倍缓解。</p>
-<h3 id="垂直分库"><a href="#垂直分库" class="headerlink" title="垂直分库"></a>垂直分库</h3><h1 id="explain"><a href="#explain" class="headerlink" title="explain"></a>explain</h1><p>使用EXPLAIN关键字可以模拟优化器执行SQL套询语句，从而知道MySQL是如何处理你的SQL语句的。分析你的查询语句或是表结构的性能瓶颈</p>
-<p>用处：</p>
-<ul>
-<li>表的读取顺序</li>
-<li>哪些索引可以使用</li>
-<li>数据读取操作的操作类型</li>
-<li>哪些索引被实际使用</li>
-<li>表之间的引用</li>
-<li>每张表有多少行被物理查询</li>
-</ul>
-<h2 id="字段"><a href="#字段" class="headerlink" title="字段"></a>字段</h2><p>在查询中的每个表会输出一行，如果有两个表通过 join 连接查询，那么会输出两行。表的意义相当广泛：可以是子查询、一个 union 结果等。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain select * from actor;</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br><span class="line">| id | select_type | table | type | possible_keys | key  | key_len | ref  | rows | Extra |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br><span class="line">|  1 | SIMPLE      | actor | ALL  | NULL          | NULL | NULL    | NULL |    2 | NULL  |</span><br><span class="line">+----+-------------+-------+------+---------------+------+---------+------+------+-------+</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="id"><a href="#id" class="headerlink" title="id"></a>id</h3><p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204152205274.png" alt="image-20211204152205274"></p>
-<p>id表示执行的优先级，相当于权值，权值越大，优先级越高。</p>
-<p>id号每个号码，表示一趟独立的查询。一个sql的查询趟数越少越好。</p>
-<ul>
-<li>id相同，执行顺序由上至下</li>
-<li>id不同，如果是子查询，id的序号会递增，id值 越大优先级越高，越先被执行</li>
-<li>id相同不同，同时存在</li>
-<li></li>
-</ul>
-<h3 id="select-type-优化用不到"><a href="#select-type-优化用不到" class="headerlink" title="select_type 优化用不到"></a>select_type 优化用不到</h3><p>常用的：</p>
-<table>
-<thead>
-<tr>
-<th align="left">类型</th>
-<th align="center">含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">SIMPLE</td>
-<td align="center">简单SELECT查询，不包含子查询和UNION</td>
-</tr>
-<tr>
-<td align="left">PRIMARY</td>
-<td align="center">复杂查询中的最外层查询，表示主要的查询</td>
-</tr>
-<tr>
-<td align="left">SUBQUERY</td>
-<td align="center">SELECT或WHERE列表中包含了子查询</td>
-</tr>
-<tr>
-<td align="left">DERIVED</td>
-<td align="center">FROM列表中包含的子查询，即衍生</td>
-</tr>
-<tr>
-<td align="left">UNION</td>
-<td align="center">UNION关键字之后的查询</td>
-</tr>
-<tr>
-<td align="left">UNION RESULT</td>
-<td align="center">从UNION后的表获取结果集</td>
-</tr>
-</tbody></table>
-<p><strong>simple</strong>：简单查询。查询不包含子查询和union</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> film <span class="keyword">where</span> id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>Primary</strong>：查询中若包含任何复杂的子部分，最外层查询则被标记为Primary</p>
-<p><strong>DERIVED</strong>：在FROM列表中包含的子查询被标记为DERIVED(衍生)，MySQL会递归执行这些子查询,把结果放在临时表里。相当于是临时表</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165315124.png" alt="image-20211204165315124"></p>
-<p><strong>SUBQUERY</strong>： 在SELECT或WHERE列表中包含了子查询</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165442525.png" alt="image-20211204165442525"></p>
-<p><strong>DEPENDENT SUBQUERY</strong>：在 SELECT或WHERE列表中包含了子查询,子查询基于外层</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165518891.png" alt="image-20211204165518891"></p>
-<p><strong>UNCACHEABLE SUBQUREY</strong>：</p>
-<p><strong>UNION</strong>：若第二个SELECT出现在UNION之后，则被标记为UNION;若UNION包含在FROM子句的子查询中,外层SELECT将被标记为: DERIVED</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204165816246.png" alt="image-20211204165816246"></p>
-<p><strong>UNION RESULT</strong>：从UNION 表获取结果的SELECT</p>
-<h3 id="table-优化用不到"><a href="#table-优化用不到" class="headerlink" title="table 优化用不到"></a>table 优化用不到</h3><p>该列的值表示输出行所引用的表的名称，比如前面的：t1、t2等表名。</p>
-<p>但也可以是以下值之一：</p>
-<ul>
-<li><code>&lt;unionM,N&gt;</code>：具有和id值的行的M并集N。</li>
-<li><code>&lt;derivedN&gt;</code>：用于与该行的派生表结果id的值N。派生表可能来自（例如）FROM子句中的子查询 。</li>
-<li><code>&lt;subqueryN&gt;</code>：子查询的结果，其id值为N</li>
-</ul>
-<h3 id="type（连接类型）-重点"><a href="#type（连接类型）-重点" class="headerlink" title="type（连接类型） 重点"></a>type（连接类型） 重点</h3><p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220104192326359" alt="图片"></p>
-<p>显示查询使用了何种类型，执行结果从最好到最坏的的顺序是从上到下。</p>
-<p>我们需要重点掌握的是下面几种类型：</p>
-<p>system（表里只有一行数据）&gt;const（where id&#x3D;1。能够通过索引直接找到）&gt;eq_ref&gt;ref&gt;range&gt;index&gt;ALL</p>
-<h4 id="ALL：即全表扫描，"><a href="#ALL：即全表扫描，" class="headerlink" title="ALL：即全表扫描，"></a><strong>ALL</strong>：即全表扫描，</h4><p>意味着mysql需要从头到尾去查找所需要的行。通常情况下这需要增加索引来进行优化了</p>
-<h4 id="index：全索引扫描"><a href="#index：全索引扫描" class="headerlink" title="index：全索引扫描"></a><strong>index</strong>：全索引扫描</h4><p>和ALL一样，不同就是mysql只需扫描索引树，这通常比ALL快一些。出现index是 sql 使用了索引但是没用通过索引进行过滤，一般是使用了覆盖索引或者是利用索引进行了排序分组。</p>
-<p>过滤条件没有用上索引，from和where之间用了索引，但是where之后没有用上索引</p>
-<h4 id="range：利用索引的范围查询"><a href="#range：利用索引的范围查询" class="headerlink" title="range：利用索引的范围查询"></a><strong>range</strong>：利用索引的范围查询</h4><p>范围扫描通常出现在 in(), between ,&gt; ,&lt;, &gt;&#x3D; 等操作中。使用一个索引来检索给定范围的行。</p>
-<h4 id="index-subquery："><a href="#index-subquery：" class="headerlink" title="index. subquery："></a><strong>index. subquery</strong>：</h4><p>利用索引来关联子查询，不再全表扫描。就是<strong>子查询使用了索引</strong></p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204171055075.png" alt="image-20211204171055075"></p>
-<h4 id="index-merge"><a href="#index-merge" class="headerlink" title="index_merge"></a>index_merge</h4><p><img src="file:///Users/helloworld/Library/Mobile%20Documents/iCloud~md~obsidian/Documents/Markdown/%E5%90%8E%E5%8F%B0/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96.assets/image-20211204170921565.png?lastModify=1641295756" alt="image-20211204170921565"></p>
-<h4 id="ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引"><a href="#ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引" class="headerlink" title="ref：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引"></a><strong>ref</strong>：联合查询，被驱动表使用非唯一索引扫描；单表，非唯一索引</h4><p>非唯一性索引扫描，返回匹配某个单独值的所有行，本质上也是一种索引访问，它返回所有匹配某个单独值的行，然而，它可能会找到多个符合条件的行，所以他应该属于查找和扫描的混合体</p>
-<p>唯一索引：对于同一个key，只返回一条数据</p>
-<p>非唯一索引：对于同一个key，返回多条数据</p>
-<h4 id="eq-ref：联合查询，被驱动表使用唯一索引"><a href="#eq-ref：联合查询，被驱动表使用唯一索引" class="headerlink" title="eq_ref：联合查询，被驱动表使用唯一索引"></a><strong>eq_ref</strong>：联合查询，被驱动表使用唯一索引</h4><p>primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种 type。</p>
-<p>唯一性索引扫描，对于每个索引键，表中只有一-条记录与之匹配。</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204170556724.png" alt="image-20211204170556724"></p>
-<h4 id="const：单表，唯一索引"><a href="#const：单表，唯一索引" class="headerlink" title="const：单表，唯一索引"></a>const：单表，唯一索引</h4><p>通过一次索引就能找到数据，一般用于主键或唯一索引作为条件的查询sql中，</p>
-<h3 id="possible-keys（可能的索引选择）"><a href="#possible-keys（可能的索引选择）" class="headerlink" title="possible_keys（可能的索引选择）"></a>possible_keys（可能的索引选择）</h3><h3 id="key（实际用到的索引-重点"><a href="#key（实际用到的索引-重点" class="headerlink" title="key（实际用到的索引)重点"></a>key（实际用到的索引)重点</h3><p>实际使用的索引。如果为NULL，则没有使用索引</p>
-<p>查询中若使用了覆盖索引，则该索引和查询的select字段重叠</p>
-<p><strong>key这一列的作用：看sql语句有没有使用索引。</strong></p>
-<h3 id="key-len（实际索引的长度）重点"><a href="#key-len（实际索引的长度）重点" class="headerlink" title="key_len（实际索引的长度）重点"></a>key_len（实际索引的长度）重点</h3><p><strong>key_len这一列的作用：看sql语句有没有&#x3D;&#x3D;充分&#x3D;&#x3D;使用索引。</strong></p>
-<p>where后面筛选条件命中索引的长度。</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204172223871.png" alt="image-20211204172223871"></p>
-<p>数值越大越好</p>
-<p>key_len&#x3D;age的字节长度+name的字节长度&#x3D;4+1 + ( 20*3+2)&#x3D;5+62&#x3D;67</p>
-<p><strong>决定key_len值的三个因素</strong>：</p>
-<p> 1.字符集</p>
-<p> 2.长度</p>
-<p> 3.是否为空 </p>
-<p>常用的字符编码占用字节数量如下：</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/640-20220104193743242" alt="图片"></p>
-<p>mysql常用字段占用字节数：</p>
-<table>
-<thead>
-<tr>
-<th align="left">字段类型</th>
-<th align="center">占用字节数</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">char(n)</td>
-<td align="center">n</td>
-</tr>
-<tr>
-<td align="left">varchar(n)</td>
-<td align="center">n + 2</td>
-</tr>
-<tr>
-<td align="left">tinyint</td>
-<td align="center">1</td>
-</tr>
-<tr>
-<td align="left">smallint</td>
-<td align="center">2</td>
-</tr>
-<tr>
-<td align="left">int</td>
-<td align="center">4</td>
-</tr>
-<tr>
-<td align="left">bigint</td>
-<td align="center">8</td>
-</tr>
-<tr>
-<td align="left">date</td>
-<td align="center">3</td>
-</tr>
-<tr>
-<td align="left">timestamp</td>
-<td align="center">4</td>
-</tr>
-<tr>
-<td align="left">datetime</td>
-<td align="center">8</td>
-</tr>
-</tbody></table>
-<p>此外，如果字段类型允许为空则加1个字节。</p>
-<h3 id="ref（与索引比较的列）"><a href="#ref（与索引比较的列）" class="headerlink" title="ref（与索引比较的列）"></a>ref（与索引比较的列）</h3><h3 id="rows（预计要检查的行数）"><a href="#rows（预计要检查的行数）" class="headerlink" title="rows（预计要检查的行数）"></a>rows（预计要检查的行数）</h3><p>物理扫描的行数，数值越少越好</p>
-<p>但这是估计的，最终扫描的行数在这个数值左右</p>
-<h3 id="Extra（附加信息）重点"><a href="#Extra（附加信息）重点" class="headerlink" title="Extra（附加信息）重点"></a>Extra（附加信息）重点</h3><p>与 order by，group by有关</p>
-<p>重点优化：</p>
-<h4 id="Using-temporary："><a href="#Using-temporary：" class="headerlink" title="Using temporary："></a><strong>Using temporary</strong>：</h4><p>group by没用上索引，使用了临时表。（group by 包含order by）</p>
-<h4 id="Using-filesort："><a href="#Using-filesort：" class="headerlink" title="Using filesort："></a><strong>Using filesort</strong>：</h4><p>order by没有用上索引</p>
-<h4 id="Using-join-buffer："><a href="#Using-join-buffer：" class="headerlink" title="Using join buffer："></a><strong>Using join buffer</strong>：</h4><p>关联字段没用上索引</p>
-<p><img src="/%E4%BC%98%E5%8C%96.assets/image-20211204172958893.png" alt="image-20211204172958893"></p>
-<p>USING index</p>
-<p>Using where</p>
-<p>impossible where</p>
-<p>select tables optimized away</p>
-<h1 id="优化点"><a href="#优化点" class="headerlink" title="优化点"></a>优化点</h1><p>优化主要与索引、事务有关</p>
-<h2 id="批量插入数据"><a href="#批量插入数据" class="headerlink" title="批量插入数据"></a>批量插入数据</h2><ol>
-<li>关闭事务自动提交</li>
-<li>删除索引</li>
-<li>mybatis框架的优化</li>
-</ol>
-<h2 id="对于索引的优化"><a href="#对于索引的优化" class="headerlink" title="对于索引的优化"></a>对于索引的优化</h2><p>主要看 explain的 type、extra两个字段</p>
-<p>重点关注：</p>
-<ul>
-<li><p>key（查看有没有使用索引）</p>
-</li>
-<li><p>key_len（查看索引使用是否充分）</p>
-</li>
-<li><p>type（查看索引类型）</p>
-</li>
-<li><p>Extra（查看附加信息：排序、临时表、where条件为false等）</p>
-<p>一般情况下根据这4列就能找到索引问题。</p>
-</li>
-</ul>
-<h2 id="关联查询的优化"><a href="#关联查询的优化" class="headerlink" title="关联查询的优化"></a>关联查询的优化</h2><ol>
-<li>保证被驱动表的 join实段已经被索引</li>
-<li>left join时， 选择小表作为驱动表，大表作为被驱动表。</li>
-<li>inner join时，mysql会自己帮你把小结果集的表选为驱动表。</li>
-<li>子查询尽量不要放在被驱动表，有可能使用不到索引。因为需要子查询结果作为虚拟表 virtual，虚拟表无法建立索引</li>
-<li>能够直接多表关联的尽量直接关联，不用子查询。</li>
-</ol>
-<h2 id="驱动表的选取"><a href="#驱动表的选取" class="headerlink" title="驱动表的选取"></a>驱动表的选取</h2><h3 id="什么是驱动表"><a href="#什么是驱动表" class="headerlink" title="什么是驱动表"></a>什么是驱动表</h3><ol>
-<li>当连接查询没有where条件时，左连接查询时，前面的表是驱动表，后面的表是被驱动表，右连接查询时相反，内连接查询时，哪张表的数据较少，哪张表就是驱动表</li>
-<li>当连接查询有where条件时，带where条件的表是驱动表，否则是被驱动表</li>
-</ol>
-<h3 id="为什么用小表驱动大表"><a href="#为什么用小表驱动大表" class="headerlink" title="为什么用小表驱动大表"></a>为什么用小表驱动大表</h3><p>关联查询类似如下的结构</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (row1 : 驱动表) &#123; <span class="comment">// 行数为 x</span></span><br><span class="line">    <span class="keyword">for</span> (row2 : 被驱动表)&#123;</span><br><span class="line">        <span class="keyword">if</span> (conidtion == <span class="literal">true</span>)&#123; <span class="comment">// 行数为 y</span></span><br><span class="line">            send client</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>时间复杂度为：（因为被驱动表用了索引）</p>
-<blockquote>
-<p>x*log(y)</p>
-</blockquote>
-<p>由上公式可知，x必定为小表</p>
-<h2 id="子查询的优化"><a href="#子查询的优化" class="headerlink" title="子查询的优化"></a>子查询的优化</h2><p>尽量不要使用not in 或者 not exists，使用left outer join on xxx is null替代</p>
-<h2 id="order-by优化"><a href="#order-by优化" class="headerlink" title="order by优化"></a>order by优化</h2><p>order by：必须要有过滤条件，才能用上索引</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 用不上索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> SQL_NO_CACHE <span class="operator">*</span> <span class="keyword">FROM</span> emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> age,deptid;</span><br><span class="line"></span><br><span class="line"># 用得上索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> SQL_NO_CACHE <span class="operator">*</span> <span class="keyword">FROM</span> emp <span class="keyword">ORDER</span> <span class="keyword">BY</span> age, deptid LIMIT <span class="number">10</span>; # 使用limit也能用索引</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="keyword">FROM</span> emp <span class="keyword">WHERE</span> age<span class="operator">=</span><span class="number">45</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptid;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>顺序错，必排序</p>
-<p>方向反，必排序</p>
-<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV12b411K7Zu?p=339">https://www.bilibili.com/video/BV12b411K7Zu?p=339</a></p>
-<h1 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h1><h1 id="优化技巧"><a href="#优化技巧" class="headerlink" title="优化技巧"></a>优化技巧</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Vv6IB9toAJ2AThdJxIOgqA">聊聊sql优化的15个小技巧 (qq.com)</a></p>
-<p>sql语句在做一些耗时的操作之前，应尽可能缩小数据范围，这样能提升sql整体的性能。</p>
-<ol>
-<li>避免使用select *</li>
-<li>用union all代替union</li>
-<li>小表驱动大表</li>
-<li>批量操作</li>
-<li>多用limit</li>
-<li>in中值太多</li>
-<li>增量查询</li>
-<li>高效的分页（逻辑分页）</li>
-<li>用连接查询代替子查询</li>
-<li>join的表不宜过多，阿里巴巴开发者手册的规定，join表的数量不应该超过<code>3</code>个。</li>
-<li>join时要注意（与inner、left join有关）</li>
-<li>控制索引的数量</li>
-<li>选择合理的字段类型</li>
-<li>提升group by的效率</li>
-<li>索引优化</li>
-</ol>
-<h2 id="1-避免使用select"><a href="#1-避免使用select" class="headerlink" title="1. 避免使用select *"></a>1. 避免使用select *</h2><p>在实际业务场景中，可能我们真正需要使用的只有其中一两列。查了很多数据，但是不用，白白浪费了数据库资源，比如：内存或者cpu。</p>
-<p>此外，多查出来的数据，通过网络IO传输的过程中，也会增加数据传输的时间。</p>
-<p>还有一个最重要的问题是：<code>select *</code>不会走<code>覆盖索引</code>，会出现大量的<code>回表</code>操作，而从导致查询sql的性能很低。</p>
-<h2 id="2-用union-all代替union"><a href="#2-用union-all代替union" class="headerlink" title="2. 用union all代替union"></a>2. 用union all代替union</h2><p>我们都知道sql语句使用<code>union</code>关键字后，可以获取排重后的数据。</p>
-<p>而如果使用<code>union all</code>关键字，可以获取所有数据，包含重复的数据。</p>
-<p><strong>排重的过程需要遍历、排序和比较，它更耗时，更消耗cpu资源</strong>。</p>
-<p>所以如果能用union all的时候，尽量不用union。</p>
-<h2 id="4-批量操作"><a href="#4-批量操作" class="headerlink" title="4. 批量操作"></a>4. 批量操作</h2><p>每次远程请求数据库，是会消耗一定性能的。</p>
-<p>但需要注意的是，不建议一次批量操作太多的数据，如果数据太多数据库响应也会很慢。批量操作需要把握一个度，建议每批数据尽量控制在500以内。如果数据多于500，则分多批次处理。</p>
-<h2 id="5-多用limit"><a href="#5-多用limit" class="headerlink" title="5. 多用limit"></a>5. 多用limit</h2><p>有时候，我们需要查询某些数据中的第一条，比如：查询某个用户下的第一个订单，想看看他第一次的首单时间。</p>
-<p><strong>反例：</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种做法在功能上没有问题，但它的效率非常不高，需要先查询出所有的数据，有点浪费资源。</p>
-<p><strong>正例：</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id, create_date </span><br><span class="line"> <span class="keyword">from</span> <span class="keyword">order</span> </span><br><span class="line"><span class="keyword">where</span> user_id<span class="operator">=</span><span class="number">123</span> </span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> create_date <span class="keyword">asc</span> </span><br><span class="line">limit <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="8-高效的分页（逻辑分页）"><a href="#8-高效的分页（逻辑分页）" class="headerlink" title="8. 高效的分页（逻辑分页）"></a>8. 高效的分页（逻辑分页）</h2><p>反例：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> limit <span class="number">1000000</span>,<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>mysql会查到1000020条数据，然后丢弃前面的1000000条，只查后面的20条数据，这个是非常浪费资源的。</p>
-<p>那么，这种海量数据该怎么分页呢？</p>
-<p>优化sql：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="operator">&gt;</span> <span class="number">1000000</span> limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>先找到上次分页最大的id，然后利用id上的索引查询。不过该方案，要求id是连续的，并且有序的。</p>
-<p>还能使用<code>between</code>优化分页。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> id,name,age </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> id <span class="keyword">between</span> <span class="number">1000000</span> <span class="keyword">and</span> <span class="number">1000020</span>;</span><br></pre></td></tr></table></figure>
-
-<p>需要注意的是between要在唯一索引上分页，不然会出现每页大小不一致的问题。</p>
-<h2 id="9-用连接查询代替子查询"><a href="#9-用连接查询代替子查询" class="headerlink" title="9. 用连接查询代替子查询"></a>9. 用连接查询代替子查询</h2><p>mysql中如果需要从两张以上的表中查询出数据的话，一般有两种实现方式：<code>子查询</code> 和 <code>连接查询</code>。</p>
-<p>子查询的例子如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="keyword">in</span> (<span class="keyword">select</span> id <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> status<span class="operator">=</span><span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
-<p>子查询语句可以通过<code>in</code>关键字实现，一个查询语句的条件落在另一个select语句的查询结果中。程序先运行在嵌套在最内层的语句，再运行外层的语句。</p>
-<p>子查询语句的优点是简单，结构化，如果涉及的表数量不多的话。</p>
-<p>但缺点是<strong>mysql执行子查询时，需要创建临时表，查询完毕后，需要再删除这些临时表，有一些额外的性能消耗。</strong></p>
-<p>这时可以改成连接查询。具体例子如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.<span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">order</span> o</span><br><span class="line"><span class="keyword">inner</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h2 id="11-join时小表驱动大表"><a href="#11-join时小表驱动大表" class="headerlink" title="11.  join时小表驱动大表"></a>11.  join时小表驱动大表</h2><p>如果两张表使用inner join关联，mysql会自动选择两张表中的小表，去驱动大表，所以性能上不会有太大的问题。</p>
-<p>使用left join的示例如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> o.id,o.code,u.name </span><br><span class="line"><span class="keyword">from</span> <span class="keyword">order</span> o </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> <span class="keyword">user</span> u <span class="keyword">on</span> o.user_id <span class="operator">=</span> u.id</span><br><span class="line"><span class="keyword">where</span> u.status<span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<p>如果两张表使用left join关联，mysql会默认用left join关键字左边的表，去驱动它右边的表。如果左边的表数据很多时，就会出现性能问题。</p>
-<blockquote>
-<p>要特别注意的是在用left join关联查询时，左边要用小表，右边可以用大表。如果能用inner join的地方，尽量少用left join。</p>
-</blockquote>
-<h2 id="12-控制索引的数量"><a href="#12-控制索引的数量" class="headerlink" title="12. 控制索引的数量"></a>12. 控制索引的数量</h2><p>mysql使用的B+树的结构来保存索引的，在insert、update和delete操作时，需要更新B+树索引。如果索引过多，会消耗很多额外的性能。</p>
-<p>阿里巴巴的开发者手册中规定，单表的索引数量应该尽量控制在<code>5</code>个以内，并且单个索引中的字段数不超过<code>5</code>个。</p>
-<p>那么，问题来了，如果表中的索引太多，超过了5个该怎么办？</p>
-<p>这个问题要辩证的看，如果你的系统并发量不高，表中的数据量也不多，其实超过5个也可以，只要不要超过太多就行。</p>
-<p>但对于一些高并发的系统，请务必遵守单表索引数量不要超过5的限制。</p>
-<p>那么，高并发系统如何优化索引数量？</p>
-<p><strong>能够建联合索引，就别建单个索引，可以删除无用的单个索引。</strong></p>
-<p>将部分查询功能迁移到其他类型的数据库中，比如：Elastic Seach、HBase等，在业务表中只需要建几个关键索引即可。</p>
-<h2 id="13-选择合理的字段类型"><a href="#13-选择合理的字段类型" class="headerlink" title="13. 选择合理的字段类型"></a>13. 选择合理的字段类型</h2><p>我们在选择字段类型时，应该遵循这样的原则：</p>
-<ol>
-<li>能用数字类型，就不用字符串，因为字符的处理往往比数字要慢。</li>
-<li>尽可能使用小的类型，比如：用bit存布尔值，用tinyint存枚举值等。</li>
-<li>长度固定的字符串字段，用char类型。</li>
-<li>长度可变的字符串字段，用varchar类型。</li>
-<li>金额字段用decimal，避免精度丢失问题。</li>
-</ol>
-<h2 id="14-提升group-by的效率"><a href="#14-提升group-by的效率" class="headerlink" title="14. 提升group by的效率"></a>14. 提升group by的效率</h2><p>我们有很多业务场景需要使用<code>group by</code>关键字，它主要的功能是去重和分组。</p>
-<p>通常它会跟<code>having</code>一起配合使用，表示分组后再根据一定的条件过滤数据。</p>
-<p><strong>反例：</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id111</span><br><span class="line"><span class="keyword">having</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法性能不好，它先把所有的订单根据用户id分组之后，再去过滤用户id大于等于200的用户。</p>
-<p>分组是一个相对耗时的操作，为什么我们不先缩小数据的范围之后，再分组呢？</p>
-<p><strong>正例：</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,user_name <span class="keyword">from</span> <span class="keyword">order</span></span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">&lt;=</span> <span class="number">200</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> user_id</span><br></pre></td></tr></table></figure>
-
-<p>使用where条件在分组前，就把多余的数据过滤掉了，这样分组时效率就会更高一些。</p>
-<blockquote>
-<p>其实这是一种思路，不仅限于group by的优化。我们的sql语句在做一些耗时的操作之前，应尽可能缩小数据范围，这样能提升sql整体的性能。</p>
-</blockquote>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/SQL/%E4%BC%98%E5%8C%96/" data-id="clirje8zx000iyosz1dscghdb" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -1156,6 +831,10 @@
       <ul>
         
           <li>
+            <a href="/2023/06/11/test1/">test1</a>
+          </li>
+        
+          <li>
             <a href="/2023/06/11/%E5%90%8E%E7%AB%AF/test/">post</a>
           </li>
         
@@ -1169,10 +848,6 @@
         
           <li>
             <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
           </li>
         
       </ul>

@@ -73,6 +73,44 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-test1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/06/11/test1/" class="article-date">
+  <time class="dt-published" datetime="2023-06-11T15:17:22.000Z" itemprop="datePublished">2023-06-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2023/06/11/test1/">test1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://balanced-b-tree.github.io/2023/06/11/test1/" data-id="clirkky7c0000n0szep9t6e3m" data-title="test1" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-后端/test" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/06/11/%E5%90%8E%E7%AB%AF/test/" class="article-date">
@@ -95,7 +133,10 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        
+        <p>图片</p>
+<p><img src="/.io//06/11/%E5%90%8E%E7%AB%AF/test/image-20230611230235943.png" alt="image-20230611230235943"></p>
+<p><img src="https://img-blog.csdnimg.cn/20191220164226525.png"></p>
+
       
     </div>
     <footer class="article-footer">
@@ -619,50 +660,6 @@
 
 
   
-    <article id="post-JavaInterview/数据库/基本概念" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" class="article-date">
-  <time class="dt-published" datetime="2023-06-11T10:43:17.561Z" itemprop="datePublished">2023-06-11</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>[toc]</p>
-<h1 id="回表"><a href="#回表" class="headerlink" title="回表"></a>回表</h1><p>什么是回表？</p>
-<p>简单来说就是数据库根据索引找到了指定的记录所在行后，还需要根据rowid再次到数据块里取数据的操作。</p>
-<p>比如这样的执行计划：</p>
-<ol>
-<li>先索引扫描，得到rowid</li>
-<li>再通过rowid去取索引中未能提供的数据，即为回表。</li>
-</ol>
-<p>“回表”一般就是指执行计划里显示的“<strong>TABLE ACCESS BY INDEX ROWID</strong>”。</p>
-<p>怎么避免回表？</p>
-<p>将需要的字段放在索引中去。查询的时候就能避免回表。但是不要刻意去避免回表，那样代价太了。也不是将所有的字段都放在所有中。</p>
-<h1 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36551991/article/details/106594768">覆盖索引是什么？一篇文章告诉你_way_more的博客-CSDN博客_覆盖索引是什么</a></p>
-<p>覆盖索引是select的数据列只用从索引中就能够取得，不必读取数据行，换句话说查询列要被所建的索引覆盖。</p>
-<p>与“回表”一起理解</p>
-<h1 id="分区表"><a href="#分区表" class="headerlink" title="分区表"></a>分区表</h1><p>分区表是一个独立的逻辑表，但是底层由多个物理子表组成。</p>
-<p>当查询条件的数据分布在某一个分区的时候，查询引擎只会去某一个分区查询，而不是遍历整个表。在管理层面，如果需要删除某一个分区的数据，只需要删除对应的分区即可。</p>
-<h2 id="按照范围分区"><a href="#按照范围分区" class="headerlink" title="按照范围分区"></a>按照范围分区</h2><h2 id="list分区"><a href="#list分区" class="headerlink" title="list分区"></a>list分区</h2><h2 id="hash分区"><a href="#hash分区" class="headerlink" title="hash分区"></a>hash分区</h2>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://balanced-b-tree.github.io/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" data-id="clirje8o10008yoszeqhveb3m" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
   <nav id="page-nav">
@@ -699,6 +696,10 @@
       <ul>
         
           <li>
+            <a href="/2023/06/11/test1/">test1</a>
+          </li>
+        
+          <li>
             <a href="/2023/06/11/%E5%90%8E%E7%AB%AF/test/">post</a>
           </li>
         
@@ -712,10 +713,6 @@
         
           <li>
             <a href="/2023/06/11/JavaInterview/%E6%A1%86%E6%9E%B6/Redis/Redis/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2023/06/11/JavaInterview/%E6%95%B0%E6%8D%AE%E5%BA%93/%E9%94%81/">(no title)</a>
           </li>
         
       </ul>
